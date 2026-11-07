@@ -464,7 +464,10 @@
         // Persistent Local Cache to prevent data loss on page refresh
         const cachedRsvps = localStorage.getItem('amukc_rsvps_cache');
         this.rsvps = cachedRsvps ? JSON.parse(cachedRsvps) : {};
-        this.resolvedAlerts = {};
+
+        // Persistent Local Cache for Resolved Alerts (Fixes alert reappearing on refresh)
+        const cachedResolved = localStorage.getItem('amukc_resolved_alerts');
+        this.resolvedAlerts = cachedResolved ? JSON.parse(cachedResolved) : {};
         this.isCloudConnected = false;
 
         // Pending Offline Queue
@@ -651,13 +654,36 @@
         this.hasSetupListeners = true;
 
         const RTDB_URL = "https://amukc-dinning-default-rtdb.firebaseio.com/rsvps.json";
+        const RTDB_RESOLVED_URL = "https://amukc-dinning-default-rtdb.firebaseio.com/resolvedAlerts.json";
 
         // Direct Realtime Database Cloud Poller & Sync Engine across all phones
         const fetchRealtimeCloudData = async () => {
           try {
-            const res = await fetch(RTDB_URL);
-            if (res.ok) {
-              const cloudData = await res.json();
+            const [resRsvps, resResolved] = await Promise.all([
+              fetch(RTDB_URL),
+              fetch(RTDB_RESOLVED_URL)
+            ]);
+
+            // Sync Cloud Resolved Alerts List
+            if (resResolved.ok) {
+              const cloudResolved = await resResolved.json();
+              if (cloudResolved) {
+                let updatedResolved = false;
+                Object.keys(cloudResolved).forEach(alertId => {
+                  if (cloudResolved[alertId] && cloudResolved[alertId].resolved && !this.resolvedAlerts[alertId]) {
+                    this.resolvedAlerts[alertId] = true;
+                    updatedResolved = true;
+                  }
+                });
+                if (updatedResolved) {
+                  localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
+                }
+              }
+            }
+
+            // Sync Cloud RSVPs
+            if (resRsvps.ok) {
+              const cloudData = await resRsvps.json();
               if (cloudData) {
                 let hasNewRefusal = false;
                 const updatedRsvps = { ...this.rsvps };
@@ -665,8 +691,9 @@
                 Object.keys(cloudData).forEach(docId => {
                   const item = cloudData[docId];
                   if (item && item.studentId) {
-                    // Check if a new refusal alert arrived from another device
-                    if (item.status === 'skipping' && item.studentId !== this.deviceId && (!this.rsvps[docId] || this.rsvps[docId].status !== 'skipping')) {
+                    const alertId = `optout_${docId}`;
+                    // Trigger toast ONLY if alert is NOT already resolved and is newly skipped
+                    if (item.status === 'skipping' && item.studentId !== this.deviceId && (!this.rsvps[docId] || this.rsvps[docId].status !== 'skipping') && !this.resolvedAlerts[alertId]) {
                       hasNewRefusal = true;
                       const devTag = 'Student (' + (item.studentId || '').slice(-4) + ')';
                       const day = DAYS_CONFIG.find(d => d.id === item.dayId) || { name: item.dayId };
@@ -885,6 +912,13 @@
         const docKey = `${studentId}_${dayId}_${mealType}`;
         const existingDoc = this.rsvps[docKey] || {};
 
+        // Reset resolved status if status changes to eating or newly updated
+        const alertId = `optout_${docKey}`;
+        if (status === 'eating') {
+          delete this.resolvedAlerts[alertId];
+          localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
+        }
+
         const updatedRecord = {
           studentId: studentId,
           messCode: MESS_CODE,
@@ -989,16 +1023,32 @@
       }
 
       async resolveAlert(alertId) {
+        // 1. Local Memory & Persistent Storage
         this.resolvedAlerts[alertId] = true;
+        localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
         this.render();
 
-        if (auth.currentUser) {
-          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'resolvedAlerts', alertId), {
-            alertId: alertId,
-            resolved: true,
-            timestamp: Date.now()
+        // 2. Realtime Database Cloud Persistence across all phones
+        const rtdbResolvedUrl = `https://amukc-dinning-default-rtdb.firebaseio.com/resolvedAlerts/${alertId}.json`;
+        try {
+          await fetch(rtdbResolvedUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ alertId: alertId, resolved: true, timestamp: Date.now() })
           });
+        } catch(e) {}
+
+        // 3. Firestore Backup Sync
+        if (auth.currentUser) {
+          try {
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'resolvedAlerts', alertId), {
+              alertId: alertId,
+              resolved: true,
+              timestamp: Date.now()
+            });
+          } catch(e) {}
         }
+
         this.showToast('Alert resolved & acknowledged', 'info');
       }
 
