@@ -460,7 +460,10 @@
 
         this.menu = DEFAULT_MENU;
         this.timings = DEFAULT_TIMINGS;
-        this.rsvps = {};
+        
+        // Persistent Local Cache to prevent data loss on page refresh
+        const cachedRsvps = localStorage.getItem('amukc_rsvps_cache');
+        this.rsvps = cachedRsvps ? JSON.parse(cachedRsvps) : {};
         this.resolvedAlerts = {};
         this.isCloudConnected = false;
 
@@ -499,6 +502,10 @@
         document.addEventListener('cut', (e) => e.preventDefault());
         document.addEventListener('contextmenu', (e) => e.preventDefault());
 
+        // Render immediately on load from local data (0ms latency, eliminates loading spinner lock)
+        this.updateHeaderTimings();
+        this.render();
+
         // Connectivity Listeners for Offline & Auto-Sync
         window.addEventListener('online', () => {
           this.updateNetworkStatusUI(true);
@@ -517,8 +524,12 @@
             this.updateNetworkStatusUI(navigator.onLine);
             this.setupRealtimeListeners();
             await this.processPendingQueue();
+            this.render();
           }
         });
+
+        // Always launch cloud polling & sync regardless of Auth state
+        this.setupRealtimeListeners();
 
         try {
           if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -529,7 +540,6 @@
         } catch (err) {
           console.warn("Firebase Auth fallback mode active:", err);
           this.isCloudConnected = true;
-          this.setupRealtimeListeners();
           this.updateNetworkStatusUI(navigator.onLine);
           this.render();
         }
@@ -637,81 +647,68 @@
       }
 
       setupRealtimeListeners() {
-        if (!auth.currentUser || this.hasSetupListeners) return;
+        if (this.hasSetupListeners) return;
         this.hasSetupListeners = true;
 
-        // 1. RSVPs Listener
-        const rsvpsCol = collection(db, 'artifacts', appId, 'public', 'data', 'rsvps');
-        let initialRsvpLoad = true;
-        onSnapshot(rsvpsCol, (snapshot) => {
-          const newRsvps = { ...this.rsvps };
+        const RTDB_URL = "https://amukc-dinning-default-rtdb.firebaseio.com/rsvps.json";
 
-          if (initialRsvpLoad) {
-            snapshot.docs.forEach(doc => {
-              newRsvps[doc.id] = doc.data();
-            });
-            initialRsvpLoad = false;
-          } else {
-            snapshot.docChanges().forEach(change => {
-              const data = change.doc.data();
-              newRsvps[change.doc.id] = data;
+        // Direct Realtime Database Cloud Poller & Sync Engine across all phones
+        const fetchRealtimeCloudData = async () => {
+          try {
+            const res = await fetch(RTDB_URL);
+            if (res.ok) {
+              const cloudData = await res.json();
+              if (cloudData) {
+                let hasNewRefusal = false;
+                const updatedRsvps = { ...this.rsvps };
 
-              if (change.type === 'added' || change.type === 'modified') {
-                if (data.status === 'skipping' && data.studentId !== this.deviceId) {
-                  const devTag = 'Student (' + (data.studentId || '').slice(-4) + ')';
-                  const day = DAYS_CONFIG.find(d => d.id === data.dayId) || { name: data.dayId };
-                  
-                  // Live refusal alert broadcast across devices linked to Mess Code AMUKC2026
-                  this.showToast(`🚨 ALERT: ${devTag} marked SKIPPING for ${day.name} ${data.mealType.toUpperCase()}!`, 'warning');
+                Object.keys(cloudData).forEach(docId => {
+                  const item = cloudData[docId];
+                  if (item && item.studentId) {
+                    // Check if a new refusal alert arrived from another device
+                    if (item.status === 'skipping' && item.studentId !== this.deviceId && (!this.rsvps[docId] || this.rsvps[docId].status !== 'skipping')) {
+                      hasNewRefusal = true;
+                      const devTag = 'Student (' + (item.studentId || '').slice(-4) + ')';
+                      const day = DAYS_CONFIG.find(d => d.id === item.dayId) || { name: item.dayId };
+                      this.showToast(`🚨 ALERT: ${devTag} marked SKIPPING for ${day.name} ${item.mealType.toUpperCase()}!`, 'warning');
+                    }
+                    updatedRsvps[docId] = item;
+                  }
+                });
+
+                this.rsvps = updatedRsvps;
+                localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
+                
+                if (hasNewRefusal) {
                   this.playAudioChime('alert');
                 }
+                this.render();
               }
-            });
+            }
+          } catch(e) {
+            console.warn("Realtime DB sync check:", e);
           }
+        };
 
-          this.rsvps = newRsvps;
-          this.render();
-        }, (err) => console.error("RSVP listener error:", err));
+        // Execute immediately and poll every 3 seconds for 100% reliable cross-phone alerts
+        fetchRealtimeCloudData();
+        setInterval(fetchRealtimeCloudData, 3000);
 
-        // 2. Resolved Alerts Listener
-        const alertsCol = collection(db, 'artifacts', appId, 'public', 'data', 'resolvedAlerts');
-        onSnapshot(alertsCol, (snapshot) => {
-          const res = {};
-          snapshot.docs.forEach(doc => {
-            res[doc.id] = true;
-          });
-          this.resolvedAlerts = res;
-          this.render();
-        });
-
-        // 3. Menu Listener
-        const menuCol = collection(db, 'artifacts', appId, 'public', 'data', 'menu');
-        onSnapshot(menuCol, (snapshot) => {
-          if (snapshot.empty) {
-            this.seedDefaultMenu();
-            return;
-          }
-          const newMenu = {};
-          snapshot.docs.forEach(doc => {
-            newMenu[doc.id] = doc.data();
-          });
-          this.menu = newMenu;
-          this.render();
-        });
-
-        // 4. Timings Listener
-        const timingsCol = collection(db, 'artifacts', appId, 'public', 'data', 'timings');
-        onSnapshot(timingsCol, (snapshot) => {
-          if (snapshot.empty) {
-            this.seedDefaultTimings();
-            return;
-          }
-          const docData = snapshot.docs.find(d => d.id === 'hours');
-          if (docData) {
-            this.timings = docData.data();
-            this.updateHeaderTimings();
-          }
-        });
+        // Firestore Backup Listener
+        if (auth.currentUser) {
+          try {
+            const rsvpsCol = collection(db, 'artifacts', appId, 'public', 'data', 'rsvps');
+            onSnapshot(rsvpsCol, (snapshot) => {
+              const newRsvps = { ...this.rsvps };
+              snapshot.docs.forEach(doc => {
+                newRsvps[doc.id] = doc.data();
+              });
+              this.rsvps = newRsvps;
+              localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
+              this.render();
+            }, (err) => console.warn("Firestore snapshot info:", err));
+          } catch(e) {}
+        }
       }
 
       async seedDefaultMenu() {
@@ -898,15 +895,28 @@
           updatedAt: Date.now()
         };
 
-        // Optimistic UI render
+        // 1. Save to Memory & Local Device Cache instantly (Prevents loss on refresh)
         this.rsvps[docKey] = updatedRecord;
+        localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
         this.render();
 
+        // 2. Direct Sync to Firebase Realtime Database Cloud (Broadcasts to all devices)
+        const rtdbSingleUrl = `https://amukc-dinning-default-rtdb.firebaseio.com/rsvps/${docKey}.json`;
+        try {
+          await fetch(rtdbSingleUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedRecord)
+          });
+        } catch(e) {
+          console.warn("Direct RTDB write info:", e);
+        }
+
+        // 3. Firestore Sync (if available)
         if (navigator.onLine && auth.currentUser) {
           try {
             await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'rsvps', docKey), updatedRecord);
           } catch (err) {
-            console.warn("Cloud write failed, adding to offline queue:", err);
             this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
           }
         } else {
@@ -949,7 +959,17 @@
         };
 
         this.rsvps[docKey] = updatedRecord;
+        localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
         this.render();
+
+        const rtdbSingleUrl = `https://amukc-dinning-default-rtdb.firebaseio.com/rsvps/${docKey}.json`;
+        try {
+          await fetch(rtdbSingleUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedRecord)
+          });
+        } catch(e) {}
 
         if (navigator.onLine && auth.currentUser) {
           try {
