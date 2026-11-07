@@ -191,7 +191,7 @@
           </h1>
           <p class="text-[10px] font-bold tracking-wider uppercase mt-1 flex items-center space-x-1" id="networkStatusContainer">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="networkStatusDot"></span>
-            <span id="headerSubTitle" class="text-emerald-400/90">Student Portal (Cloud Synced)</span>
+            <span id="headerSubTitle" class="text-emerald-400/90">Mess Code: AMUKC2026 (Live Synced)</span>
           </p>
         </div>
       </div>
@@ -360,10 +360,11 @@
   <!-- FIREBASE REALTIME SYNC & APPLICATION CORE SCRIPT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const ADMIN_PASSWORD_KEY = 'AMUKC2026';
+    const MESS_CODE = 'AMUKC2026';
 
     const DEFAULT_TIMINGS = {
       breakfast: "9:30 AM - 11:00 AM",
@@ -510,16 +511,21 @@
           this.showToast('⚡ Offline Mode: Responses will auto-sync when online', 'warning');
         });
 
+        onAuthStateChanged(auth, async (user) => {
+          if (user) {
+            this.isCloudConnected = true;
+            this.updateNetworkStatusUI(navigator.onLine);
+            this.setupRealtimeListeners();
+            await this.processPendingQueue();
+          }
+        });
+
         try {
           if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
             await signInWithCustomToken(auth, __initial_auth_token);
           } else {
             await signInAnonymously(auth);
           }
-          this.isCloudConnected = true;
-          this.updateNetworkStatusUI(navigator.onLine);
-          this.setupRealtimeListeners();
-          this.processPendingQueue();
         } catch (err) {
           console.warn("Firebase Auth fallback mode active:", err);
           this.isCloudConnected = true;
@@ -544,7 +550,7 @@
           } else {
             dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
             title.className = 'text-emerald-400/90';
-            title.innerText = this.role === 'student' ? 'Student Portal (Cloud Synced)' : 'Admin Console';
+            title.innerText = this.role === 'student' ? `Mess Code: ${MESS_CODE} (Live Synced)` : 'Admin Console Active';
           }
         } else {
           dot.className = 'w-2 h-2 rounded-full bg-rose-500 animate-pulse';
@@ -631,24 +637,38 @@
       }
 
       setupRealtimeListeners() {
-        if (!auth.currentUser) return;
+        if (!auth.currentUser || this.hasSetupListeners) return;
+        this.hasSetupListeners = true;
 
         // 1. RSVPs Listener
         const rsvpsCol = collection(db, 'artifacts', appId, 'public', 'data', 'rsvps');
         let initialRsvpLoad = true;
         onSnapshot(rsvpsCol, (snapshot) => {
-          const newRsvps = {};
-          snapshot.docs.forEach(doc => {
-            const data = doc.data();
-            newRsvps[doc.id] = data;
+          const newRsvps = { ...this.rsvps };
 
-            if (!initialRsvpLoad && this.role === 'admin' && data.status === 'skipping' && data.updatedAt > Date.now() - 5000) {
-              const devTag = 'Student (' + (data.studentId || '').slice(-4) + ')';
-              this.showToast(`🚨 Refusal Alert: ${devTag} marked SKIPPING for ${data.mealType.toUpperCase()}!`, 'warning');
-              this.playAudioChime('alert');
-            }
-          });
-          initialRsvpLoad = false;
+          if (initialRsvpLoad) {
+            snapshot.docs.forEach(doc => {
+              newRsvps[doc.id] = doc.data();
+            });
+            initialRsvpLoad = false;
+          } else {
+            snapshot.docChanges().forEach(change => {
+              const data = change.doc.data();
+              newRsvps[change.doc.id] = data;
+
+              if (change.type === 'added' || change.type === 'modified') {
+                if (data.status === 'skipping' && data.studentId !== this.deviceId) {
+                  const devTag = 'Student (' + (data.studentId || '').slice(-4) + ')';
+                  const day = DAYS_CONFIG.find(d => d.id === data.dayId) || { name: data.dayId };
+                  
+                  // Live refusal alert broadcast across devices linked to Mess Code AMUKC2026
+                  this.showToast(`🚨 ALERT: ${devTag} marked SKIPPING for ${day.name} ${data.mealType.toUpperCase()}!`, 'warning');
+                  this.playAudioChime('alert');
+                }
+              }
+            });
+          }
+
           this.rsvps = newRsvps;
           this.render();
         }, (err) => console.error("RSVP listener error:", err));
@@ -870,6 +890,7 @@
 
         const updatedRecord = {
           studentId: studentId,
+          messCode: MESS_CODE,
           dayId: dayId,
           mealType: mealType,
           status: status,
