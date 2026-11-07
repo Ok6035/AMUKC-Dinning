@@ -1,1126 +1,1344 @@
+<!-- Chosen Palette: Slate Emerald Amber Warm Palette -->
+<!-- Application Structure Plan: Single-page mobile app for AMUKC Dinning Portal with direct inline SVG logo, real-time WebSocket database sync, role switching between Student and Admin, meal RSVP tracking, instant alert resolution with meal status auto-reset, and weekly menu/timing management. -->
+<!-- Visualization & Content Choices: Uses inline SVG logo emblem, HTML/CSS badges, Chart-free clean layout, real-time status indicators, interactive meal buttons, and dynamic alert feed cards. NO Mermaid JS. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-<title>AMUKC Dinning Portal</title>
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- FontAwesome Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- Google Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script>
-tailwind.config = {
-theme: {
-extend: {
-fontFamily: {
-sans: ['Plus Jakarta Sans', 'sans-serif'],
-},
-colors: {
-mess: {
-50: '#fff7ed',
-100: '#ffedd5',
-500: '#f97316',
-600: '#ea580c',
-700: '#c2410c',
-}
-}
-}
-}
-}
-</script>
-<style>
-/* Mobile Touch, Copy Protection & Zoom Restriction */
-*, html, body, input, textarea, button, select {
--webkit-tap-highlight-color: transparent;
-user-select: none !important;
--webkit-user-select: none !important;
--moz-user-select: none !important;
--ms-user-select: none !important;
-touch-action: manipulation;
-}
-input, textarea {
-user-select: text !important;
--webkit-user-select: text !important;
-}
-.no-scrollbar::-webkit-scrollbar {
-display: none;
-}
-.no-scrollbar {
--ms-overflow-style: none;
-scrollbar-width: none;
-}
-.gpu-layer {
-transform: translate3d(0,0,0);
-will-change: transform, opacity;
-}
-@keyframes pulse-ring {
-0% { transform: scale(0.97); opacity: 0.8; }
-50% { transform: scale(1.03); opacity: 1; }
-100% { transform: scale(0.97); opacity: 0.8; }
-}
-.alert-pulse {
-animation: pulse-ring 1.8s infinite ease-in-out;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <title>AMUKC Dinning Portal</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+            script: ['Great Vibes', 'cursive']
+          },
+          colors: {
+            mess: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Mobile Touch, Copy Protection & Zoom Restriction */
+    *, html, body, input, textarea, button, select {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      touch-action: manipulation;
+    }
+    input, textarea {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .gpu-layer {
+      transform: translate3d(0,0,0);
+      will-change: transform, opacity;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.97); opacity: 0.8; }
+      50% { transform: scale(1.03); opacity: 1; }
+      100% { transform: scale(0.97); opacity: 0.8; }
+    }
+    .alert-pulse {
+      animation: pulse-ring 1.8s infinite ease-in-out;
+    }
+  </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans antialiased selection:bg-orange-500 selection:text-white pb-20 md:pb-0 transition-colors duration-300" id="appBody" oncopy="return false;" oncut="return false;" oncontextmenu="return false;">
-​<!-- Mobile Frame Container -->
-<div class="max-w-md mx-auto min-h-screen bg-white text-slate-800 flex flex-col shadow-2xl relative overflow-hidden border-x border-slate-200">
-​<!-- GLOBAL NAVBAR HEADER -->
-<header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md border-b border-slate-800 gpu-layer">
-​<!-- ROW 1: Logo & Title Bar -->
-<div class="p-3 flex items-center space-x-3 border-b border-slate-800/80 bg-slate-950/70">
-<!-- Exact Vector Emblem Logo (AMUKC Dinning Plaque) -->
-<div class="w-16 h-13 flex items-center justify-center shrink-0 overflow-hidden bg-slate-900 p-0.5 rounded-xl border border-amber-500/40 shadow-md">
-<svg viewBox="0 0 500 350" class="w-full h-full object-contain filter drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-<stop offset="0%" stop-color="#f59e0b" />
-<stop offset="35%" stop-color="#fef08a" />
-<stop offset="70%" stop-color="#d97706" />
-<stop offset="100%" stop-color="#92400e" />
-</linearGradient>
-​<linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-<stop offset="0%" stop-color="#064e3b" />
-<stop offset="100%" stop-color="#022c22" />
-</linearGradient>
-​<linearGradient id="clocheGrad" x1="0%" y1="0%" x2="100%" y2="50%">
-<stop offset="0%" stop-color="#047857" />
-<stop offset="40%" stop-color="#064e3b" />
-<stop offset="100%" stop-color="#022c22" />
-</linearGradient>
-</defs>
-​<!-- Background Oval Plaque with Gold Gradient Outer Rings -->
-<ellipse cx="250" cy="175" rx="240" ry="165" fill="#fffdfa" stroke="url(#goldGrad)" stroke-width="6"/>
-<ellipse cx="250" cy="175" rx="232" ry="157" fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-dasharray="8 4" opacity="0.6"/>
-​<!-- Rising Steam Lines Above Cloche Knob -->
-<path d="M 235 48 Q 243 32 238 18" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-linecap="round"/>
-<path d="M 250 43 Q 258 27 252 12" fill="none" stroke="url(#goldGrad)" stroke-width="4.5" stroke-linecap="round"/>
-<path d="M 265 48 Q 273 32 268 18" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-linecap="round"/>
-​<!-- Cloche Dome Top Knob -->
-<circle cx="250" cy="54" r="10" fill="url(#goldGrad)"/>
-<rect x="245" y="60" width="10" height="6" rx="2" fill="url(#goldGrad)"/>
-​<!-- Main Cloche Dome Cover -->
-<path d="M 136 155 Q 136 66 250 66 Q 364 66 364 155 Z" fill="url(#clocheGrad)"/>
-<path d="M 148 152 Q 148 78 250 78 Q 352 78 352 152" fill="none" stroke="url(#goldGrad)" stroke-width="4" opacity="0.95"/>
-​<!-- Mosque / Heritage Architecture Silhouette inside Cloche Base -->
-<g fill="#022c22">
-<rect x="180" y="125" width="140" height="30" rx="2"/>
-<path d="M 232 155 L 232 136 A 18 18 0 0 1 268 136 L 268 155 Z" fill="#fffdfa"/>
-<path d="M 235 155 L 235 138 A 15 15 0 0 1 265 138 L 265 155 Z" fill="#022c22"/>
-<path d="M 238 125 C 238 112 250 104 250 102 C 250 104 262 112 262 125 Z"/>
-​<!-- Minarets -->
-<rect x="180" y="115" width="8" height="40"/>
-<path d="M 178 115 L 184 105 L 190 115 Z"/>
-<rect x="206" y="110" width="10" height="45"/>
-<path d="M 204 110 L 211 98 L 218 110 Z"/>
-<rect x="284" y="110" width="10" height="45"/>
-<path d="M 282 110 L 289 98 L 296 110 Z"/>
-<rect x="312" y="115" width="8" height="40"/>
-<path d="M 310 115 L 316 105 L 322 115 Z"/>
-​<!-- Trees Flanking Heritage Base -->
-<circle cx="152" cy="142" r="14"/>
-<circle cx="164" cy="138" r="16"/>
-<circle cx="172" cy="145" r="12"/>
-<circle cx="328" cy="145" r="12"/>
-<circle cx="336" cy="138" r="16"/>
-<circle cx="348" cy="142" r="14"/>
-</g>
-​<!-- Platter Base Tray -->
-<path d="M 90 162 L 410 162 L 390 168 L 110 168 Z" fill="url(#goldGrad)"/>
-<line x1="80" y1="162" x2="420" y2="162" stroke="#022c22" stroke-width="3" stroke-linecap="round"/>
-​<!-- Left Dinner Fork -->
-<g transform="translate(130, 155) rotate(-32)">
-<rect x="-4" y="-70" width="8" height="110" rx="4" fill="url(#emeraldGrad)"/>
-<path d="M -16 -110 L -16 -75 C -16 -65 -4 -60 -4 -60 L 4 -60 C 4 -60 16 -65 16 -75 L 16 -110 L 12 -110 L 12 -80 L 6 -80 L 6 -110 L 2 -110 L 2 -80 L -2 -80 L -2 -110 L -6 -110 L -6 -80 L -12 -80 L -12 -110 Z" fill="url(#emeraldGrad)"/>
-</g>
-​<!-- Right Dinner Spoon -->
-<g transform="translate(370, 155) rotate(32)">
-<rect x="-4" y="-70" width="8" height="110" rx="4" fill="url(#emeraldGrad)"/>
-<ellipse cx="0" cy="-88" rx="17" ry="26" fill="url(#emeraldGrad)"/>
-</g>
-​<!-- Text Typography: AMUKC Dinning -->
-<text x="250" y="235" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="900" font-size="64" fill="#043e2b" letter-spacing="4">AMUKC</text>
-<text x="250" y="295" text-anchor="middle" font-family="'Brush Script MT', 'Great Vibes', 'Segoe Script', cursive" font-style="italic" font-weight="bold" font-size="58" fill="#043e2b">Dinning</text>
-​<!-- Gold Divider Lines -->
-<line x1="82" y1="254" x2="155" y2="254" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round"/>
-<line x1="345" y1="254" x2="418" y2="254" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round"/>
-​<!-- Bottom Crossed Cutlery Accent -->
-<path d="M 160 316 L 220 316" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
-<path d="M 280 316 L 340 316" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
-<g transform="translate(250, 316) scale(0.65)">
-<line x1="-15" y1="-15" x2="15" y2="15" stroke="#043e2b" stroke-width="4" stroke-linecap="round"/>
-<line x1="15" y1="-15" x2="-15" y2="15" stroke="#043e2b" stroke-width="4" stroke-linecap="round"/>
-<circle cx="-15" cy="-15" r="4" fill="#043e2b"/>
-<circle cx="15" cy="-15" r="4" fill="#043e2b"/>
-</g>
-</svg>
-</div>
-​<!-- Header Title & Cloud Connection Badge -->
-<div class="flex-1">
-<h1 class="text-base font-black tracking-tight leading-none flex items-center space-x-1">
-<span class="text-emerald-400">AMUKC</span>
-<span class="text-amber-400 font-serif italic text-base">Dinning</span>
-<span class="text-slate-100 font-semibold text-xs tracking-normal">Portal</span>
-</h1>
-<p class="text-[10px] font-bold tracking-wider uppercase mt-1 flex items-center space-x-1" id="networkStatusContainer">
-<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="networkStatusDot"></span>
-<span id="headerSubTitle" class="text-emerald-400/90">Instant WebSocket Synced</span>
-</p>
-</div>
-</div>
-​<!-- ROW 2: Student and Admin Switcher Bar -->
-<div class="p-2.5 bg-slate-900 flex items-center justify-between border-b border-slate-800">
-<div class="w-full grid grid-cols-2 bg-slate-950 p-1 rounded-2xl border border-slate-800 gap-1">
-<button id="btnRoleStudent" onclick="app.switchRole('student')" class="py-2 px-3 rounded-xl text-xs font-extrabold transition-all duration-200 flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md active:scale-95">
-<i class="fa-solid fa-child-reaching text-xs"></i>
-<span>Student</span>
-</button>
-​<button id="btnRoleAdmin" onclick="app.requestAdminAccess()" class="py-2 px-3 rounded-xl text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center justify-center space-x-2 relative active:scale-95">
-<i class="fa-solid fa-lock text-[10px] text-amber-400" id="adminLockIcon"></i>
-<span>Admin</span>
-<span id="adminAlertBadge" class="hidden absolute -top-1 -right-1 bg-rose-600 text-white text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border-2 border-slate-950 shadow">0</span>
-</button>
-</div>
-</div>
-​<!-- Admin Header Lock Strip -->
-<div id="adminLockHeaderStrip" class="hidden bg-indigo-950 px-3.5 py-1.5 border-t border-indigo-800 flex justify-between items-center text-xs">
-<span class="text-indigo-200 font-bold flex items-center">
-<i class="fa-solid fa-shield-halved text-emerald-400 mr-1.5"></i> Admin Console Active
-</span>
-<button onclick="app.lockAdminAccess()" class="bg-rose-900/80 hover:bg-rose-800 text-rose-200 text-[10px] font-extrabold px-2.5 py-0.5 rounded-md border border-rose-500/40 transition-colors flex items-center space-x-1 active:scale-95">
-<i class="fa-solid fa-lock text-[10px]"></i>
-<span>Lock</span>
-</button>
-</div>
-​<!-- Meal Service Timings Banner -->
-<div class="bg-slate-950 px-3.5 py-1.5 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-300 font-semibold overflow-x-auto no-scrollbar whitespace-nowrap">
-<span class="flex items-center text-amber-400 font-bold"><i class="fa-solid fa-clock mr-1"></i> Timings:</span>
-<span class="bg-slate-900 px-2 py-0.5 rounded-md text-amber-200 border border-slate-800">🥣 Breakfast: <strong id="timingBreakfast">9:30 AM - 11:00 AM</strong></span>
-<span class="bg-slate-900 px-2 py-0.5 rounded-md text-amber-200 border border-slate-800 ml-1.5">🍱 Lunch: <strong id="timingLunch">1:45 PM - 3:30 PM</strong></span>
-<span class="bg-slate-900 px-2 py-0.5 rounded-md text-amber-200 border border-slate-800 ml-1.5">🍲 Dinner: <strong id="timingDinner">8:00 PM - 10:00 PM</strong></span>
-</div>
-</header>
-​<!-- MAIN APP CONTENT CONTAINER -->
-<main class="flex-1 p-3.5 overflow-y-auto no-scrollbar space-y-4 gpu-layer" id="mainContent">
-<div class="py-16 text-center text-slate-400">
-<i class="fa-solid fa-circle-notch fa-spin text-4xl text-orange-500 mb-3"></i>
-<p class="text-xs font-bold tracking-wide">Loading AMUKC Dinning Portal...</p>
-</div>
-</main>
-​<!-- BOTTOM NAVIGATION BAR -->
-<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-slate-200 z-30 shadow-2xl gpu-layer">
-<!-- Student Bottom Navigation Label -->
-<div id="studentNav" class="py-2.5 text-center text-xs font-bold text-orange-600 flex items-center justify-center space-x-2">
-<i class="fa-solid fa-calendar-check text-sm"></i>
-<span>AMUKC Student Meal Planner</span>
-</div>
-​<!-- Admin Bottom Navigation Tabs -->
-<div id="adminNav" class="hidden grid grid-cols-2 text-center py-2">
-<button onclick="app.setAdminTab('alerts')" id="tabAdminAlerts" class="py-1 flex flex-col items-center text-indigo-600 font-bold text-xs relative active:scale-95 transition-transform">
-<i class="fa-solid fa-triangle-exclamation text-base mb-0.5"></i>
-<span>Refusal Alerts</span>
-<span id="alertsTabDot" class="hidden absolute top-1 right-12 w-2 h-2 bg-rose-500 rounded-full animate-ping"></span>
-</button>
-<button onclick="app.setAdminTab('menu')" id="tabAdminMenu" class="py-1 flex flex-col items-center text-slate-500 font-medium text-xs hover:text-slate-800 active:scale-95 transition-transform">
-<i class="fa-solid fa-pen-to-square text-base mb-0.5"></i>
-<span>Edit Menu</span>
-</button>
-</div>
-</nav>
-​<!-- FLOATING TOAST STACK -->
-<div id="toastContainer" class="fixed top-24 left-1/2 -translate-x-1/2 z-50 w-full max-w-xs px-4 pointer-events-none transition-all duration-300"></div>
-​<!-- MODAL: ADMIN SECURITY AUTHENTICATION -->
-<div id="modalAdminAuth" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
-<div class="bg-white rounded-3xl w-full max-w-xs p-5 shadow-2xl border border-slate-200 text-center text-slate-800">
-<div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl border border-indigo-200">
-<i class="fa-solid fa-user-shield"></i>
-</div>
-<h3 class="font-black text-slate-900 text-base">Admin Security Check</h3>
-<p class="text-xs text-slate-500 mt-1 mb-4">Enter security password to access Admin Console.</p>
-​<form onsubmit="app.verifyAdminPassword(event)" class="space-y-3">
-<div>
-<div class="relative">
-<input type="password" id="adminPasswordInput" placeholder="Enter Password" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-center text-sm font-bold tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600">
-<button type="button" onclick="app.togglePasswordVisibility()" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 text-xs">
-<i class="fa-solid fa-eye" id="passwordEyeIcon"></i>
-</button>
-</div>
-<p id="passwordErrorMsg" class="hidden text-rose-600 font-bold text-[11px] mt-1.5 flex items-center justify-center space-x-1">
-<i class="fa-solid fa-circle-exclamation"></i>
-<span>Incorrect Password! (AMUKC2026)</span>
-</p>
-</div>
-​<div class="pt-2 flex space-x-2">
-<button type="button" onclick="app.closeModal('modalAdminAuth')" class="w-1/2 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 active:scale-95 transition-transform">Cancel</button>
-<button type="submit" class="w-1/2 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl text-xs font-extrabold hover:from-indigo-700 hover:to-indigo-800 shadow-md shadow-indigo-600/30 active:scale-95 transition-all">Unlock</button>
-</div>
-</form>
-</div>
-</div>
-​<!-- MODAL: EDIT MENU DISH -->
-<div id="modalEditMenu" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
-<div class="bg-white rounded-3xl w-full max-w-xs p-5 shadow-2xl border border-slate-200 text-slate-800">
-<h3 class="font-black text-slate-900 text-base mb-3" id="editMenuTitle">Edit Meal Dish</h3>
-​<form onsubmit="app.handleSaveMenuEdit(event)" class="space-y-3">
-<input type="hidden" id="editDayId">
-<input type="hidden" id="editMealType">
-​<div>
-<label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Meal Dish Description</label>
-<input type="text" id="editMealTitleInput" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500">
-</div>
-​<div>
-<label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Diet Choice Option</label>
-<select id="editMealHasChoice" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500">
-<option value="false">Standard Meal (No Veg Choice)</option>
-<option value="true">Veg / Non-Veg Option (Paneer / Chicken)</option>
-</select>
-</div>
-​<div class="pt-2 flex space-x-2">
-<button type="button" onclick="app.closeModal('modalEditMenu')" class="w-1/2 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200">Cancel</button>
-<button type="submit" class="w-1/2 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl text-xs font-extrabold shadow-md">Save</button>
-</div>
-</form>
-</div>
-</div>
-​<!-- MODAL: EDIT SERVICE TIMINGS -->
-<div id="modalEditTimings" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
-<div class="bg-white rounded-3xl w-full max-w-xs p-5 shadow-2xl border border-slate-200 text-slate-800">
-<h3 class="font-black text-slate-900 text-base mb-3">Edit Mess Service Hours</h3>
-​<form onsubmit="app.handleSaveTimings(event)" class="space-y-3">
-<div>
-<label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Breakfast Timing</label>
-<input type="text" id="inputTimingBreakfast" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500">
-</div>
-​<div>
-<label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Lunch Timing</label>
-<input type="text" id="inputTimingLunch" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500">
-</div>
-​<div>
-<label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Dinner Timing</label>
-<input type="text" id="inputTimingDinner" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500">
-</div>
-​<div class="pt-2 flex space-x-2">
-<button type="button" onclick="app.closeModal('modalEditTimings')" class="w-1/2 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200">Cancel</button>
-<button type="submit" class="w-1/2 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl text-xs font-extrabold shadow-md">Update Hours</button>
-</div>
-</form>
-</div>
-</div>
-​</div>
-​<!-- FIREBASE WEBSOCKET REALTIME SYNC & APPLICATION CORE SCRIPT -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-​const ADMIN_PASSWORD_KEY = 'AMUKC2026';
-const MESS_CODE = 'AMUKC2026';
-​const DEFAULT_TIMINGS = {
-breakfast: "9:30 AM - 11:00 AM",
-lunch: "1:45 PM - 3:30 PM",
-dinner: "8:00 PM - 10:00 PM"
-};
-​const DAYS_CONFIG = [
-{ id: 'mon', name: 'Monday', short: 'Mon' },
-{ id: 'tue', name: 'Tuesday', short: 'Tue' },
-{ id: 'wed', name: 'Wednesday', short: 'Wed' },
-{ id: 'thu', name: 'Thursday', short: 'Thu' },
-{ id: 'fri', name: 'Friday', short: 'Fri' },
-{ id: 'sat', name: 'Saturday', short: 'Sat' },
-{ id: 'sun', name: 'Sunday', short: 'Sun' }
-];
-​const DEFAULT_MENU = {
-mon: {
-breakfast: { name: 'Anda Paratha' },
-lunch: { name: 'Chane Ki Daal, Roti' },
-dinner: { name: 'Aloo Methi, Dal, Rice, Roti' }
-},
-tue: {
-breakfast: { name: 'Sabzi Poori' },
-lunch: { name: 'Aloo Tamatar, Daal, Rice, Roti' },
-dinner: { name: 'Egg Curry, Roti, Rice' }
-},
-wed: {
-breakfast: { name: 'Aloo Paratha' },
-lunch: { name: 'Daal, Bhindi, Rice, Roti' },
-dinner: { name: 'Chicken / Paneer Biryani', hasVegChoice: true }
-},
-thu: {
-breakfast: { name: 'Anda Paratha' },
-lunch: { name: 'Matar Pulao' },
-dinner: { name: 'Kala chana, Poori' }
-},
-fri: {
-breakfast: { name: 'Halwa Poori' },
-lunch: { name: 'Chicken / Paneer Biryani', hasVegChoice: true },
-dinner: { name: 'Aloo Dum, Rice, Roti' }
-},
-sat: {
-breakfast: { name: 'Aloo Paratha' },
-lunch: { name: 'Aloo Tamatar, Daal, Rice, Roti' },
-dinner: { name: 'Chole, Rice, Roti' }
-},
-sun: {
-breakfast: { name: 'Chole Bhature' },
-lunch: { name: 'Masoor Dal, Chokha, Roti, Rice' },
-dinner: { name: 'Chicken Korma / Paneer', hasVegChoice: true }
-}
-};
-​const appId = typeof __app_id !== 'undefined' ? __app_id : 'amukc-dining-portal-v6';
-​const firebaseConfig = typeof __firebase_config !== 'undefined'
-? JSON.parse(__firebase_config)
-: {
-apiKey: "AIzaSyD7mB88sbpMQZl8HsWDTFrCsExLRSZtHSk",
-authDomain: "amukc-dinning.firebaseapp.com",
-databaseURL: "https://amukc-dinning-default-rtdb.firebaseio.com",
-projectId: "amukc-dinning",
-storageBucket: "amukc-dinning.firebasestorage.app",
-messagingSenderId: "474331563181",
-appId: "1:474331563181:web:f0c533f6f9993278727224",
-measurementId: "G-EC8M5RERBR"
-};
-​const fbApp = initializeApp(firebaseConfig);
-const auth = getAuth(fbApp);
-const rtdb = getDatabase(fbApp);
-const db = getFirestore(fbApp);
-​class MessApp {
-constructor() {
-this.role = 'student';
-this.isAdminAuthenticated = false;
-this.adminTab = 'alerts';
-​// Auto-detect current day of week
-const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-const todayIndex = new Date().getDay();
-this.selectedDayId = dayKeys[todayIndex] || 'mon';
-​let devId = localStorage.getItem('mess_device_id');
-if (!devId) {
-devId = 'dev_' + Math.random().toString(36).substring(2, 9);
-localStorage.setItem('mess_device_id', devId);
-}
-this.deviceId = devId;
-​this.menu = DEFAULT_MENU;
-this.timings = DEFAULT_TIMINGS;
-​// Daily Auto Reset Verification
-this.verifyDailyReset();
-​// Persistent Local Cache
-const cachedRsvps = localStorage.getItem('amukc_rsvps_cache');
-this.rsvps = cachedRsvps ? JSON.parse(cachedRsvps) : {};
-​const cachedResolved = localStorage.getItem('amukc_resolved_alerts');
-this.resolvedAlerts = cachedResolved ? JSON.parse(cachedResolved) : {};
-​// Offline Queue
-this.pendingQueue = JSON.parse(localStorage.getItem('mess_pending_queue') || '[]');
-​try {
-this.broadcastChannel = new BroadcastChannel('amukc_sync_channel');
-this.broadcastChannel.onmessage = (e) => {
-if (e.data && e.data.type === 'SYNC_REFRESH') {
-this.render();
-}
-};
-} catch(e) {}
-}
-​verifyDailyReset() {
-const todayStr = new Date().toISOString().split('T')[0];
-const lastDate = localStorage.getItem('amukc_last_active_date');
-if (lastDate && lastDate !== todayStr) {
-// New date detected: Clear cached daily RSVPs so every day restores cleanly
-localStorage.removeItem('amukc_rsvps_cache');
-this.rsvps = {};
-localStorage.setItem('amukc_last_active_date', todayStr);
-} else if (!lastDate) {
-localStorage.setItem('amukc_last_active_date', todayStr);
-}
-}
-​async init() {
-// Prevent multi-touch zoom and pinch zoom
-document.addEventListener('touchstart', (e) => {
-if (e.touches.length > 1) {
-e.preventDefault();
-}
-}, { passive: false });
-​let lastTouchEnd = 0;
-document.addEventListener('touchend', (e) => {
-const now = Date.now();
-if (now - lastTouchEnd <= 300) {
-e.preventDefault();
-}
-lastTouchEnd = now;
-}, false);
-​// Prevent Copy, Cut & Context Menu
-document.addEventListener('copy', (e) => e.preventDefault());
-document.addEventListener('cut', (e) => e.preventDefault());
-document.addEventListener('contextmenu', (e) => e.preventDefault());
-​// Render immediately from local memory (0ms startup latency)
-this.updateHeaderTimings();
-this.render();
-​// Connectivity Listeners
-window.addEventListener('online', () => {
-this.updateNetworkStatusUI(true);
-this.showToast('📶 Online Connection Restored! Syncing...', 'info');
-this.processPendingQueue();
-});
-​window.addEventListener('offline', () => {
-this.updateNetworkStatusUI(false);
-this.showToast('⚡ Offline Mode: Responses will auto-sync when online', 'warning');
-});
-​// Setup Instant Firebase Realtime WebSocket Connection
-this.setupRealtimeWebSockets();
-​onAuthStateChanged(auth, async (user) => {
-if (user) {
-this.updateNetworkStatusUI(navigator.onLine);
-await this.processPendingQueue();
-this.render();
-}
-});
-​try {
-if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-await signInWithCustomToken(auth, __initial_auth_token);
-} else {
-await signInAnonymously(auth);
-}
-} catch (err) {
-console.warn("Firebase Auth fallback mode active:", err);
-this.updateNetworkStatusUI(navigator.onLine);
-this.render();
-}
-}
-​updateNetworkStatusUI(isOnline) {
-const dot = document.getElementById('networkStatusDot');
-const title = document.getElementById('headerSubTitle');
-if (!dot || !title) return;
-​const pendingCount = this.pendingQueue.length;
-​if (isOnline) {
-if (pendingCount > 0) {
-dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
-title.className = 'text-amber-400 font-bold';
-title.innerText = Syncing (${pendingCount} Pending)...;
-} else {
-dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
-title.className = 'text-emerald-400/90';
-title.innerText = this.role === 'student' ? 'Instant WebSocket Synced' : 'Admin Console Active';
-}
-} else {
-dot.className = 'w-2 h-2 rounded-full bg-rose-500 animate-pulse';
-title.className = 'text-rose-400 font-bold';
-title.innerText = pendingCount > 0 ? Offline (${pendingCount} Queued) : 'Offline Mode';
-}
-}
-​// INSTANT SUB-SECOND WEBSOCKET LISTENER ENGINE
-setupRealtimeWebSockets() {
-if (this.hasSetupWebsockets) return;
-this.hasSetupWebsockets = true;
-​// 1. Instant WebSocket listener for RSVP changes across all devices
-const rsvpsRef = ref(rtdb, 'rsvps');
-onValue(rsvpsRef, (snapshot) => {
-const cloudData = snapshot.val();
-if (cloudData) {
-let hasNewRefusal = false;
-const updatedRsvps = { ...this.rsvps };
-​Object.keys(cloudData).forEach(docId => {
-const item = cloudData[docId];
-if (item && item.studentId) {
-const alertId = optout_${docId};
-​// Instant alert notification if new refusal from another device
-if (item.status === 'skipping' && item.studentId !== this.deviceId && (!this.rsvps[docId] || this.rsvps[docId].status !== 'skipping') && !this.resolvedAlerts[alertId]) {
-hasNewRefusal = true;
-const devTag = 'Student (' + (item.studentId || '').slice(-4) + ')';
-const day = DAYS_CONFIG.find(d => d.id === item.dayId) || { name: item.dayId };
-this.showToast(🚨 INSTANT ALERT: ${devTag} marked SKIPPING for ${day.name} ${item.mealType.toUpperCase()}!, 'warning');
-}
-updatedRsvps[docId] = item;
-}
-});
-​this.rsvps = updatedRsvps;
-localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
-​if (hasNewRefusal) {
-this.playAudioChime('alert');
-}
-this.render();
-}
-}, (error) => {
-console.warn("WebSocket RTDB subscription fallback:", error);
-});
-​// 2. Instant WebSocket listener for Resolved Alerts state
-const resolvedRef = ref(rtdb, 'resolvedAlerts');
-onValue(resolvedRef, (snapshot) => {
-const cloudResolved = snapshot.val();
-if (cloudResolved) {
-let updatedResolved = false;
-Object.keys(cloudResolved).forEach(alertId => {
-if (cloudResolved[alertId] && cloudResolved[alertId].resolved && !this.resolvedAlerts[alertId]) {
-this.resolvedAlerts[alertId] = true;
-updatedResolved = true;
-}
-});
-if (updatedResolved) {
-localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
-this.render();
-}
-}
-});
-}
-​async processPendingQueue() {
-if (!navigator.onLine || this.pendingQueue.length === 0) return;
-​const queueToProcess = [...this.pendingQueue];
-this.pendingQueue = [];
-localStorage.setItem('mess_pending_queue', JSON.stringify([]));
-this.updateNetworkStatusUI(true);
-​let syncedCount = 0;
-for (const item of queueToProcess) {
-try {
-if (item.type === 'rsvp') {
-const singleRef = ref(rtdb, rsvps/${item.docKey});
-await set(singleRef, item.record);
-syncedCount++;
-}
-} catch (e) {
-this.pendingQueue.push(item);
-}
-}
-​localStorage.setItem('mess_pending_queue', JSON.stringify(this.pendingQueue));
-this.updateNetworkStatusUI(navigator.onLine);
-​if (syncedCount > 0) {
-this.showToast(✅ Auto-Synced ${syncedCount} response(s) to cloud!, 'success');
-this.playAudioChime('success');
-}
-}
-​playAudioChime(type = 'alert') {
-try {
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-if (!AudioContext) return;
-const ctx = new AudioContext();
-​if (type === 'alert') {
-const osc1 = ctx.createOscillator();
-const osc2 = ctx.createOscillator();
-const gain = ctx.createGain();
-​osc1.type = 'triangle';
-osc2.type = 'sine';
-​osc1.frequency.setValueAtTime(659.25, ctx.currentTime);
-osc1.frequency.setValueAtTime(880, ctx.currentTime + 0.15);
-​osc2.frequency.setValueAtTime(329.63, ctx.currentTime);
-osc2.frequency.setValueAtTime(440, ctx.currentTime + 0.15);
-​gain.gain.setValueAtTime(0.2, ctx.currentTime);
-gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-​osc1.connect(gain);
-osc2.connect(gain);
-gain.connect(ctx.destination);
-​osc1.start(ctx.currentTime);
-osc2.start(ctx.currentTime);
-osc1.stop(ctx.currentTime + 0.4);
-osc2.stop(ctx.currentTime + 0.4);
-} else {
-const osc = ctx.createOscillator();
-const gain = ctx.createGain();
-osc.type = 'sine';
-osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-gain.gain.setValueAtTime(0.1, ctx.currentTime);
-gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
-osc.connect(gain);
-gain.connect(ctx.destination);
-osc.start();
-osc.stop(ctx.currentTime + 0.25);
-}
-} catch(e) {}
-}
-​updateHeaderTimings() {
-document.getElementById('timingBreakfast').innerText = this.timings.breakfast || DEFAULT_TIMINGS.breakfast;
-document.getElementById('timingLunch').innerText = this.timings.lunch || DEFAULT_TIMINGS.lunch;
-document.getElementById('timingDinner').innerText = this.timings.dinner || DEFAULT_TIMINGS.dinner;
-}
-​requestAdminAccess() {
-if (this.role === 'admin') return;
-​if (this.isAdminAuthenticated) {
-this.switchRole('admin');
-} else {
-document.getElementById('adminPasswordInput').value = '';
-document.getElementById('passwordErrorMsg').classList.add('hidden');
-this.openModal('modalAdminAuth');
-}
-}
-​verifyAdminPassword(e) {
-e.preventDefault();
-const enteredPassword = document.getElementById('adminPasswordInput').value.trim();
-​if (enteredPassword === ADMIN_PASSWORD_KEY) {
-this.isAdminAuthenticated = true;
-this.closeModal('modalAdminAuth');
-this.switchRole('admin');
-this.playAudioChime('success');
-this.showToast('🔓 Admin Console Unlocked!', 'success');
-} else {
-document.getElementById('passwordErrorMsg').classList.remove('hidden');
-this.playAudioChime('alert');
-this.showToast('❌ Incorrect Password! (AMUKC2026)', 'warning');
-}
-}
-​togglePasswordVisibility() {
-const input = document.getElementById('adminPasswordInput');
-const icon = document.getElementById('passwordEyeIcon');
-if (input.type === 'password') {
-input.type = 'text';
-icon.className = 'fa-solid fa-eye-slash';
-} else {
-input.type = 'password';
-icon.className = 'fa-solid fa-eye';
-}
-}
-​lockAdminAccess() {
-this.isAdminAuthenticated = false;
-this.switchRole('student');
-this.showToast('🔒 Admin Console Locked', 'info');
-}
-​switchRole(role) {
-this.role = role;
-​const btnStudent = document.getElementById('btnRoleStudent');
-const btnAdmin = document.getElementById('btnRoleAdmin');
-const lockIcon = document.getElementById('adminLockIcon');
-const lockHeaderStrip = document.getElementById('adminLockHeaderStrip');
-const sNav = document.getElementById('studentNav');
-const aNav = document.getElementById('adminNav');
-const subTitle = document.getElementById('headerSubTitle');
-​if (role === 'student') {
-btnStudent.className = 'py-2 px-3 rounded-xl text-xs font-extrabold transition-all duration-200 flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md active:scale-95';
-btnAdmin.className = 'py-2 px-3 rounded-xl text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center justify-center space-x-2 relative active:scale-95';
-​if (this.isAdminAuthenticated) {
-lockIcon.className = 'fa-solid fa-unlock text-[10px] text-emerald-400';
-} else {
-lockIcon.className = 'fa-solid fa-lock text-[10px] text-amber-400';
-}
-​lockHeaderStrip.classList.add('hidden');
-sNav.classList.remove('hidden');
-sNav.classList.add('flex');
-aNav.classList.add('hidden');
-aNav.classList.remove('grid');
-subTitle.innerText = 'Instant WebSocket Synced';
-} else {
-btnStudent.className = 'py-2 px-3 rounded-xl text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center justify-center space-x-2 active:scale-95';
-btnAdmin.className = 'py-2 px-3 rounded-xl text-xs font-extrabold transition-all duration-200 flex items-center justify-center space-x-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-md active:scale-95';
-lockIcon.className = 'fa-solid fa-unlock text-[10px] text-emerald-400';
-​lockHeaderStrip.classList.remove('hidden');
-sNav.classList.add('hidden');
-sNav.classList.remove('flex');
-aNav.classList.remove('hidden');
-aNav.classList.add('grid');
-subTitle.innerText = 'Admin Console';
-}
-​this.render();
-}
-​setAdminTab(tab) {
-this.adminTab = tab;
-['alerts', 'menu'].forEach(t => {
-const btn = document.getElementById(tabAdmin${t.charAt(0).toUpperCase() + t.slice(1)});
-if (btn) {
-btn.className = t === tab
-? 'py-1 flex flex-col items-center text-indigo-600 font-bold text-xs active:scale-95 transition-transform'
-: 'py-1 flex flex-col items-center text-slate-500 font-medium text-xs hover:text-slate-800 active:scale-95 transition-transform';
-}
-});
-this.render();
-}
-​getUnresolvedAlerts() {
-let alerts = [];
-​Object.keys(this.rsvps).forEach(docId => {
-const item = this.rsvps[docId];
-if (item && item.status === 'skipping') {
-const alertId = optout_${docId};
-if (!this.resolvedAlerts[alertId]) {
-const devTag = 'Student (' + (item.studentId || '').slice(-4) + ')';
-const day = DAYS_CONFIG.find(d => d.id === item.dayId) || { name: item.dayId };
-const meal = this.menu[item.dayId]?.[item.mealType] || { name: 'Meal' };
-​alerts.push({
-id: alertId,
-docKey: docId,
-type: 'opt_out',
-studentTag: devTag,
-dayName: day.name,
-mealType: item.mealType,
-mealName: meal.name,
-title: ${devTag} marked SKIPPING for ${day.name} ${item.mealType.toUpperCase()},
-desc: Dish: "${meal.name}". Student indicated they will not consume this meal.,
-badgeText: 'Meal Skipping Refusal',
-timeText: item.updatedAt ? new Date(item.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'RSVP Signal'
-});
-}
-}
-});
-​return alerts;
-}
-​updateAlertBadges() {
-const alerts = this.getUnresolvedAlerts();
-const badge = document.getElementById('adminAlertBadge');
-const dot = document.getElementById('alertsTabDot');
-​if (alerts.length > 0) {
-if (badge) {
-badge.innerText = alerts.length;
-badge.classList.remove('hidden');
-}
-if (dot) dot.classList.remove('hidden');
-} else {
-if (badge) badge.classList.add('hidden');
-if (dot) dot.classList.add('hidden');
-}
-}
-​// TOGGLE RSVP WITH UN-TOGGLE SUPPORT & INSTANT WEBSOCKET SYNC
-async toggleRsvp(dayId, mealType, targetStatus) {
-const studentId = this.deviceId;
-const docKey = ${studentId}_${dayId}_${mealType};
-const existingDoc = this.rsvps[docKey] || {};
-​// If user clicks Skipping Meal again when already skipping, toggle back to eating
-let newStatus = targetStatus;
-if (existingDoc.status === targetStatus && targetStatus === 'skipping') {
-newStatus = 'eating';
-}
-​const alertId = optout_${docKey};
-if (newStatus === 'eating') {
-delete this.resolvedAlerts[alertId];
-localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
-}
-​const updatedRecord = {
-studentId: studentId,
-messCode: MESS_CODE,
-dayId: dayId,
-mealType: mealType,
-status: newStatus,
-choice: existingDoc.choice || 'Paneer',
-updatedAt: Date.now(),
-dateStamp: new Date().toISOString().split('T')[0]
-};
-​// 1. Instant local state update
-this.rsvps[docKey] = updatedRecord;
-localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
-this.render();
-​// 2. Sub-50ms Instant WebSocket Write to Firebase Realtime Database
-if (navigator.onLine) {
-try {
-const singleRef = ref(rtdb, rsvps/${docKey});
-await set(singleRef, updatedRecord);
-} catch (err) {
-this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
-}
-} else {
-this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
-}
-​if (this.broadcastChannel) {
-this.broadcastChannel.postMessage({ type: 'SYNC_REFRESH' });
-}
-​if (newStatus === 'skipping') {
-const isOff = !navigator.onLine;
-this.showToast(isOff ? '⚡ Saved offline: Skipped response queued' : '🚨 Skipped signal sent to Admin', 'warning');
-} else {
-const isOff = !navigator.onLine;
-this.showToast(isOff ? '⚡ Saved offline: Attendance saved' : '✅ Will Eat confirmed for ' + mealType.toUpperCase(), 'success');
-this.playAudioChime('success');
-}
-}
-​enqueuePendingItem(item) {
-this.pendingQueue = this.pendingQueue.filter(q => q.docKey !== item.docKey);
-this.pendingQueue.push(item);
-localStorage.setItem('mess_pending_queue', JSON.stringify(this.pendingQueue));
-this.updateNetworkStatusUI(navigator.onLine);
-}
-​async setItemChoice(dayId, mealType, choice) {
-const studentId = this.deviceId;
-const docKey = ${studentId}_${dayId}_${mealType};
-const existingDoc = this.rsvps[docKey] || {};
-​const updatedRecord = {
-studentId: studentId,
-dayId: dayId,
-mealType: mealType,
-status: existingDoc.status || 'eating',
-choice: choice,
-updatedAt: Date.now(),
-dateStamp: new Date().toISOString().split('T')[0]
-};
-​this.rsvps[docKey] = updatedRecord;
-localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
-this.render();
-​if (navigator.onLine) {
-try {
-const singleRef = ref(rtdb, rsvps/${docKey});
-await set(singleRef, updatedRecord);
-} catch(e) {
-this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
-}
-} else {
-this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
-}
-​this.showToast(Preference set to ${choice}, 'info');
-}
-​// RESOLVE ALERT & RESET MEAL RSVP TO WILL EAT ACROSS ALL DEVICES
-async resolveAlert(alertId) {
-// Extract associated docKey if alert is optout_${docKey}
-if (alertId.startsWith('optout_')) {
-const docKey = alertId.replace('optout_', '');
-​// Reset RSVP status back to 'eating' in local state & cache
-if (this.rsvps[docKey]) {
-this.rsvps[docKey].status = 'eating';
-this.rsvps[docKey].updatedAt = Date.now();
-} else {
-const parts = docKey.split('_');
-if (parts.length >= 3) {
-this.rsvps[docKey] = {
-studentId: parts[0],
-dayId: parts[1],
-mealType: parts[2],
-status: 'eating',
-updatedAt: Date.now()
-};
-}
-}
-localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
-​// Clean up local & cloud resolved markers
-delete this.resolvedAlerts[alertId];
-localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
-​// Sync reset to Firebase Realtime Database
-if (navigator.onLine) {
-try {
-const singleRef = ref(rtdb, rsvps/${docKey});
-await set(singleRef, this.rsvps[docKey]);
-​const alertRef = ref(rtdb, resolvedAlerts/${alertId});
-await set(alertRef, null);
-} catch(e) {}
-}
-} else {
-this.resolvedAlerts[alertId] = true;
-localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
-}
-​this.render();
-if (this.broadcastChannel) {
-this.broadcastChannel.postMessage({ type: 'SYNC_REFRESH' });
-}
-this.showToast('Alert resolved! Meal status reset to Will Eat', 'info');
-}
-​// RENDER ROUTER
-render() {
-const container = document.getElementById('mainContent');
-if (!container) return;
-this.updateAlertBadges();
-​if (this.role === 'student') {
-container.innerHTML = this.renderStudentRsvpView();
-} else {
-if (this.adminTab === 'alerts') {
-container.innerHTML = this.renderAdminAlertsView();
-} else {
-container.innerHTML = this.renderAdminMenuView();
-}
-}
-}
-​// --- STUDENT VIEW RENDER ---
-renderStudentRsvpView() {
-return <!-- Day Selector Bar --> <div class="flex space-x-1.5 overflow-x-auto no-scrollbar py-1"> ${DAYS_CONFIG.map(d =>
-<button onclick="app.selectedDayId = '${d.id}'; app.render();" class="px-3.5 py-2 rounded-2xl text-xs font-extrabold transition-all flex-1 min-w-[55px] text-center active:scale-95 ${this.selectedDayId === d.id ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md ring-2 ring-emerald-500/50' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}">
-<div>${d.short}</div>
-</button>
-`).join('')}
-</div>
-​<!-- Day Menu & Attendance List -->
-<div class="space-y-3">
-<div class="flex justify-between items-center px-1">
-<h3 class="text-xs font-black uppercase tracking-wider text-slate-500">
-${DAYS_CONFIG.find(d => d.id === this.selectedDayId)?.name}'s Mess Menu
-</h3>
-<span class="text-[10px] font-extrabold bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-300 flex items-center space-x-1">
-<i class="fa-solid fa-bolt text-[9px] animate-pulse"></i>
-<span>Instant WebSocket</span>
-</span>
-</div>
-​${['breakfast', 'lunch', 'dinner'].map(mealType => {
-const meal = this.menu[this.selectedDayId]?.[mealType] || { name: 'Standard Meal' };
-const studentId = this.deviceId;
-const rsvpKey = ${studentId}_${this.selectedDayId}_${mealType};
-const rsvpItem = this.rsvps[rsvpKey] || {};
-const isEating = (rsvpItem.status || 'eating') === 'eating';
-const mealTime = this.timings[mealType] || DEFAULT_TIMINGS[mealType];
-const currentChoice = rsvpItem.choice || 'Paneer';
-​const icons = { breakfast: '🍳', lunch: '🍱', dinner: '🍲' };
-​return `
-<div class="bg-white rounded-3xl p-4 border ${isEating ? 'border-slate-200' : 'border-rose-300 bg-rose-50/40'} shadow-md space-y-3 transition-all gpu-layer">
-<div class="flex items-start justify-between">
-<div class="flex items-center space-x-3">
-<div class="text-3xl p-2.5 rounded-2xl ${isEating ? 'bg-orange-50 text-orange-600 border border-orange-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}">
-{icons[mealType]}
-</div>
-<div>
-<div class="flex items-center space-x-2">
-<span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">{mealType}</span>
-<span class="text-[10px] text-amber-800 font-extrabold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">{mealTime}</span>
-</div>
-<h4 class="font-black text-slate-900 text-base leading-snug mt-0.5">{meal.name}</h4>
-</div>
-</div>
-</div>
-​<!-- Diet Choice Option -->
-${meal.hasVegChoice ? <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-200 flex items-center justify-between"> <span class="text-xs font-bold text-slate-700">Choose Diet Option:</span> <div class="flex space-x-1"> <button onclick="app.setItemChoice('${this.selectedDayId}', '${mealType}', 'Paneer')" class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center space-x-1 active:scale-95 ${currentChoice === 'Paneer' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-300'}"> <span class="w-2 h-2 rounded-full bg-emerald-400"></span> <span>Paneer (Veg)</span> </button> <button onclick="app.setItemChoice('${this.selectedDayId}', '${mealType}', 'Chicken')" class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center space-x-1 active:scale-95 ${currentChoice === 'Chicken' ? 'bg-rose-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-300'}"> <span class="w-2 h-2 rounded-full bg-rose-400"></span> <span>Chicken (Non-Veg)</span> </button> </div> </div> : ''}
-​<!-- RSVP Buttons -->
-<div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100">
-<button onclick="app.toggleRsvp('${this.selectedDayId}', '${mealType}', 'eating')" class="py-2.5 px-3 rounded-2xl font-black text-xs flex items-center justify-center space-x-1.5 transition-all active:scale-95 ${isEating ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md ring-2 ring-emerald-500/30' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
-<i class="fa-solid fa-circle-check text-sm"></i>
-<span>Will Eat</span>
-</button>
-​<button onclick="app.toggleRsvp('${this.selectedDayId}', '${mealType}', 'skipping')" class="py-2.5 px-3 rounded-2xl font-black text-xs flex items-center justify-center space-x-1.5 transition-all active:scale-95 ${!isEating ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md ring-2 ring-rose-500/30' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
-<i class="fa-solid fa-circle-xmark text-sm"></i>
-<span>Skipping Meal</span>
-</button>
-</div>
-</div>
-; }).join('')} </div> ;
-}
-​// --- ADMIN VIEWS RENDER ---
-renderAdminAlertsView() {
-const alerts = this.getUnresolvedAlerts();
-const totalResponding = new Set(Object.values(this.rsvps).map(r => r.studentId)).size;
-​return `
-<!-- Summary Cards -->
-<div class="grid grid-cols-2 gap-2.5 gpu-layer">
-<div class="bg-slate-900 text-white rounded-3xl p-4 shadow-md border border-slate-800">
-<span class="text-[10px] font-bold text-orange-400 uppercase tracking-wider">Active Devices</span>
-<div class="text-2xl font-black mt-0.5 text-white">${totalResponding}</div>
-<span class="text-[10px] text-slate-400">Responding Students</span>
-</div>
-​<div class="bg-gradient-to-br from-rose-600 to-rose-700 text-white rounded-3xl p-4 shadow-md alert-pulse border border-rose-500/40">
-<span class="text-[10px] font-bold text-rose-100 uppercase tracking-wider">Refusal Alerts</span>
-<div class="text-2xl font-black mt-0.5">${alerts.length}</div>
-<span class="text-[10px] text-rose-100 font-semibold">Skipping Meals</span>
-</div>
-</div>
-​<!-- Live Alert Feed -->
-<div class="space-y-3">
-<div class="flex items-center justify-between px-1">
-<h3 class="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center space-x-1.5">
-<i class="fa-solid fa-bell text-rose-600"></i>
-<span>Meal Refusal Alerts</span>
-</h3>
-<span class="text-[11px] text-slate-500 font-bold">${alerts.length} Active</span>
-</div>
-​${alerts.length === 0 ? <div class="bg-emerald-50 border border-emerald-200 rounded-3xl p-6 text-center"> <div class="text-3xl mb-2">✅</div> <h4 class="font-bold text-emerald-800 text-sm">No Active Refusal Alerts</h4> <p class="text-xs text-emerald-600 mt-1">All children are attending scheduled meals normally.</p> </div> : alerts.map(alert => `
-<div class="bg-white rounded-3xl p-4 border-2 border-rose-400 shadow-md space-y-2.5 relative overflow-hidden gpu-layer">
-<div class="absolute top-0 left-0 bottom-0 w-1.5 bg-rose-500"></div>
-​<div class="flex justify-between items-start pl-2">
-<div>
-<span class="bg-rose-100 text-rose-800 border border-rose-300 text-[10px] font-black uppercase px-2 py-0.5 rounded-full inline-block mb-1">
-🚨 {alert.badgeText}
-</span>
-<h4 class="font-black text-slate-900 text-sm">{alert.title}</h4>
-<p class="text-xs font-bold text-slate-500">{alert.dayName} ({alert.mealType.toUpperCase()})</p>
-</div>
-<span class="text-[10px] text-slate-400 font-semibold">${alert.timeText}</span>
-</div>
-​<p class="text-xs text-slate-700 pl-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200 font-medium">${alert.desc}</p>
-​<div class="flex justify-end space-x-2 pt-2 border-t border-slate-100">
-<button onclick="app.resolveAlert('${alert.id}')" class="px-3.5 py-1.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 shadow-sm flex items-center space-x-1.5 active:scale-95">
-<i class="fa-solid fa-check text-xs text-emerald-400"></i>
-<span>Acknowledge & Resolve</span>
-</button>
-</div>
-</div>
-).join('')} </div> ;
-}
-​renderAdminMenuView() {
-return `
-<div class="space-y-4 gpu-layer">
-<div class="flex justify-between items-center px-1">
-<h3 class="text-xs font-black uppercase tracking-wider text-slate-500">Weekly Mess Schedule Editor</h3>
-<button onclick="app.openModal('modalEditTimings')" class="text-[11px] bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-3 py-1 rounded-xl shadow-sm active:scale-95 transition-transform">
-<i class="fa-solid fa-clock mr-1 text-amber-400"></i> Timings
-</button>
-</div>
-​<!-- Day Selector -->
-<div class="flex space-x-1.5 overflow-x-auto no-scrollbar py-1">
-${DAYS_CONFIG.map(d => <button onclick="app.selectedDayId = '${d.id}'; app.render();" class="px-3.5 py-2 rounded-2xl text-xs font-extrabold transition-all flex-1 min-w-[55px] text-center active:scale-95 ${this.selectedDayId === d.id ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}"> <div>${d.short}</div> </button>).join('')}
-</div>
-​<!-- Editable Meal Cards -->
-<div class="space-y-3">
-${['breakfast', 'lunch', 'dinner'].map(m => {
-const meal = this.menu[this.selectedDayId]?.[m] || { name: '' };
-​return <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm space-y-2"> <div class="flex justify-between items-start"> <div> <span class="text-[10px] font-black uppercase text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">${m} (${this.timings[m] || ''})</span> <h4 class="font-extrabold text-slate-900 text-base mt-1">${meal.name}</h4> ${meal.hasVegChoice ?<span class="inline-block mt-1 bg-emerald-50 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-200">Veg / Non-Veg Option Enabled</span>: ''} </div> <button onclick="app.openEditMenuModal('${this.selectedDayId}', '${m}')" class="p-2.5 text-orange-600 hover:bg-slate-100 rounded-2xl transition-all active:scale-90"> <i class="fa-solid fa-pen-to-square text-lg"></i> </button> </div> </div>;
-}).join('')}
-</div>
-</div>
-`;
-}
-​openEditMenuModal(dayId, mealType) {
-const meal = this.menu[dayId]?.[mealType] || { name: '' };
-document.getElementById('editDayId').value = dayId;
-document.getElementById('editMealType').value = mealType;
-document.getElementById('editMealTitleInput').value = meal.name;
-document.getElementById('editMealHasChoice').value = meal.hasVegChoice ? 'true' : 'false';
-​document.getElementById('editMenuTitle').innerText = Edit ${dayId.toUpperCase()} ${mealType.toUpperCase()};
-this.openModal('modalEditMenu');
-}
-​async handleSaveMenuEdit(e) {
-e.preventDefault();
-const dayId = document.getElementById('editDayId').value;
-const mealType = document.getElementById('editMealType').value;
-const name = document.getElementById('editMealTitleInput').value.trim();
-const hasChoice = document.getElementById('editMealHasChoice').value === 'true';
-​const updatedDayObj = { ...(this.menu[dayId] || {}) };
-updatedDayObj[mealType] = { name, hasVegChoice: hasChoice };
-​this.menu[dayId] = updatedDayObj;
-​if (navigator.onLine) {
-try {
-const menuRef = ref(rtdb, menu/${dayId});
-await set(menuRef, updatedDayObj);
-} catch(e) {}
-}
-​this.closeModal('modalEditMenu');
-this.render();
-this.showToast('Menu updated successfully!', 'success');
-}
-​async handleSaveTimings(e) {
-e.preventDefault();
-const newTimings = {
-breakfast: document.getElementById('inputTimingBreakfast').value.trim(),
-lunch: document.getElementById('inputTimingLunch').value.trim(),
-dinner: document.getElementById('inputTimingDinner').value.trim()
-};
-​this.timings = newTimings;
-this.updateHeaderTimings();
-​if (navigator.onLine) {
-try {
-const timingsRef = ref(rtdb, timings/hours);
-await set(timingsRef, newTimings);
-} catch(e) {}
-}
-​this.closeModal('modalEditTimings');
-this.render();
-this.showToast('Mess service hours updated!', 'success');
-}
-​openModal(id) {
-document.getElementById(id).classList.remove('hidden');
-if (id === 'modalEditTimings') {
-document.getElementById('inputTimingBreakfast').value = this.timings.breakfast || DEFAULT_TIMINGS.breakfast;
-document.getElementById('inputTimingLunch').value = this.timings.lunch || DEFAULT_TIMINGS.lunch;
-document.getElementById('inputTimingDinner').value = this.timings.dinner || DEFAULT_TIMINGS.dinner;
-}
-}
-​closeModal(id) {
-document.getElementById(id).classList.add('hidden');
-}
-​showToast(msg, type = 'info') {
-const container = document.getElementById('toastContainer');
-if (!container) return;
-const toast = document.createElement('div');
-​const bg = type === 'success' ? 'bg-emerald-600 text-white' : type === 'warning' ? 'bg-rose-600 text-white' : 'bg-slate-900 text-white';
-​toast.className = ${bg} px-4 py-3 rounded-2xl shadow-2xl text-xs font-bold flex items-center space-x-2 transition-all duration-300 transform translate-y-3 opacity-0 border border-white/20;
-toast.innerHTML = <span>${msg}</span>;
-​container.appendChild(toast);
-​requestAnimationFrame(() => {
-toast.classList.remove('translate-y-3', 'opacity-0');
-});
-​setTimeout(() => {
-toast.classList.add('opacity-0', '-translate-y-3');
-setTimeout(() => toast.remove(), 300);
-}, 3000);
-}
-}
-​// Launch Application
-window.app = new MessApp();
-window.addEventListener('DOMContentLoaded', () => {
-window.app.init();
-});
-</script>
+
+  <!-- Mobile Frame Container -->
+  <div class="max-w-md mx-auto min-h-screen bg-white text-slate-800 flex flex-col shadow-2xl relative overflow-hidden border-x border-slate-200">
+
+    <!-- GLOBAL NAVBAR HEADER -->
+    <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md border-b border-slate-800 gpu-layer">
+      
+      <!-- ROW 1: Logo & Title Bar -->
+      <div class="p-2.5 flex items-center space-x-3 border-b border-slate-800/80 bg-slate-950/90">
+        
+        <!-- High-Precision Inline Vector Logo Badge (41250_3.png Replica) -->
+        <div class="w-14 h-14 flex items-center justify-center shrink-0 overflow-hidden bg-gradient-to-b from-amber-50 to-amber-100 rounded-2xl border-2 border-amber-400 shadow-lg p-0.5">
+          <svg viewBox="0 0 500 350" class="w-full h-full object-contain" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background Oval Glow -->
+            <ellipse cx="250" cy="175" rx="240" ry="160" fill="#fffbeb"/>
+            
+            <!-- Golden Outer Plaque Border & Swooshes -->
+            <ellipse cx="250" cy="175" rx="235" ry="155" fill="none" stroke="url(#goldGrad)" stroke-width="10"/>
+            <ellipse cx="250" cy="175" rx="225" ry="145" fill="none" stroke="#064e3b" stroke-width="3"/>
+
+            <defs>
+              <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#b45309"/>
+                <stop offset="50%" stop-color="#f59e0b"/>
+                <stop offset="100%" stop-color="#d97706"/>
+              </linearGradient>
+              <linearGradient id="domeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#064e3b"/>
+                <stop offset="50%" stop-color="#022c22"/>
+                <stop offset="100%" stop-color="#064e3b"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Rising Steam Lines -->
+            <path d="M225,45 Q215,25 230,10 Q240,25 230,40" fill="none" stroke="#d97706" stroke-width="4" stroke-linecap="round"/>
+            <path d="M250,42 Q240,20 255,5 Q265,20 255,37" fill="none" stroke="#f59e0b" stroke-width="5" stroke-linecap="round"/>
+            <path d="M275,45 Q265,25 280,10 Q290,25 280,40" fill="none" stroke="#d97706" stroke-width="4" stroke-linecap="round"/>
+
+            <!-- Left Fork -->
+            <g fill="#064e3b">
+              <path d="M85,150 L115,80 L125,85 L95,155 Z"/>
+              <path d="M115,80 Q105,60 90,50 L85,55 Q98,63 105,82 Z"/>
+              <path d="M120,77 Q115,55 105,45 L100,48 Q108,58 112,78 Z"/>
+              <path d="M125,82 Q125,58 120,43 L115,45 Q118,58 118,80 Z"/>
+            </g>
+
+            <!-- Right Spoon -->
+            <g fill="#064e3b">
+              <path d="M415,150 L385,80 L375,85 L405,155 Z"/>
+              <ellipse cx="395" cy="55" rx="16" ry="24" transform="rotate(22 395 55)"/>
+            </g>
+
+            <!-- Cloche Dome Body -->
+            <path d="M140,135 Q140,48 250,48 Q360,48 360,135 Z" fill="url(#domeGrad)"/>
+            
+            <!-- Cloche Dome Metallic Top Rib & Handle Knob -->
+            <path d="M140,135 Q140,55 250,55 Q360,55 360,135 Z" fill="none" stroke="#f59e0b" stroke-width="6"/>
+            <circle cx="250" cy="48" r="10" fill="url(#goldGrad)"/>
+
+            <!-- Heritage Building Silhouette Inside Cloche -->
+            <g fill="#022c22">
+              <rect x="180" y="105" width="140" height="30"/>
+              <!-- Central Dome -->
+              <path d="M235,105 Q250,88 265,105 Z"/>
+              <!-- Minarets -->
+              <rect x="185" y="90" width="8" height="15"/>
+              <polygon points="189,82 185,90 193,90"/>
+              <rect x="205" y="94" width="6" height="11"/>
+              <polygon points="208,87 205,94 211,94"/>
+              <rect x="289" y="94" width="6" height="11"/>
+              <polygon points="292,87 289,94 295,94"/>
+              <rect x="307" y="90" width="8" height="15"/>
+              <polygon points="311,82 307,90 315,90"/>
+              <!-- Arches -->
+              <path d="M238,135 L238,115 Q250,108 262,115 L262,135 Z" fill="#fffbeb"/>
+              <rect x="195" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
+              <rect x="210" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
+              <rect x="222" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
+              <rect x="270" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
+              <rect x="282" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
+              <rect x="297" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
+            </g>
+
+            <!-- Trees Flanking Monument -->
+            <circle cx="160" cy="120" r="14" fill="#064e3b"/>
+            <circle cx="170" cy="124" r="10" fill="#022c22"/>
+            <circle cx="340" cy="120" r="14" fill="#064e3b"/>
+            <circle cx="330" cy="124" r="10" fill="#022c22"/>
+
+            <!-- Platter Base Line -->
+            <rect x="90" y="135" width="320" height="7" rx="3.5" fill="url(#goldGrad)"/>
+            <polygon points="90,142 410,142 250,148" fill="#064e3b"/>
+
+            <!-- AMUKC Bold Typography -->
+            <text x="250" y="215" font-family="'Playfair Display', Georgia, serif" font-weight="900" font-size="78" fill="#064e3b" text-anchor="middle" letter-spacing="2">AMUKC</text>
+
+            <!-- Dinning Script Typography -->
+            <path d="M100,230 L400,230" stroke="url(#goldGrad)" stroke-width="3"/>
+            <text x="250" y="278" font-family="'Great Vibes', cursive" font-size="64" fill="#064e3b" text-anchor="middle" font-weight="bold">Dinning</text>
+            
+            <!-- Bottom Golden Arc & Crossed Mini Cutlery -->
+            <path d="M160,290 Q250,310 340,290" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+            <g transform="translate(250, 312) scale(0.6)" fill="#064e3b">
+              <!-- Crossed Fork & Spoon -->
+              <path d="M-15,-15 L15,15 M-10,-15 L-5,-25 M-15,-10 L-25,-5 M-12,-12 L-20,-20" stroke="#064e3b" stroke-width="4"/>
+              <ellipse cx="15" cy="-15" rx="6" ry="9" transform="rotate(45 15 -15)"/>
+              <line x1="-15" y1="15" x2="15" y2="-15" stroke="#064e3b" stroke-width="4"/>
+            </g>
+            <path d="M120,320 L210,320 M290,320 L380,320" stroke="url(#goldGrad)" stroke-width="3"/>
+          </svg>
+        </div>
+
+        <!-- Header Title & Cloud Connection Badge -->
+        <div class="flex-1">
+          <h1 class="text-base font-black tracking-tight leading-none flex items-center space-x-1">
+            <span class="text-emerald-400 font-serif">AMUKC</span>
+            <span class="text-amber-400 font-script italic text-xl -my-1">Dinning</span>
+            <span class="text-slate-100 font-semibold text-xs tracking-normal ml-0.5">Portal</span>
+          </h1>
+          <p class="text-[10px] font-bold tracking-wider uppercase mt-1 flex items-center space-x-1" id="networkStatusContainer">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="networkStatusDot"></span>
+            <span id="headerSubTitle" class="text-emerald-400/90">Instant WebSocket Synced</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- ROW 2: Student and Admin Switcher Bar -->
+      <div class="p-2.5 bg-slate-900 flex items-center justify-between border-b border-slate-800">
+        <div class="w-full grid grid-cols-2 bg-slate-950 p-1 rounded-2xl border border-slate-800 gap-1">
+          <button id="btnRoleStudent" onclick="app.switchRole('student')" class="py-2 px-3 rounded-xl text-xs font-extrabold transition-all duration-200 flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md active:scale-95">
+            <i class="fa-solid fa-child-reaching text-xs"></i>
+            <span>Student</span>
+          </button>
+          
+          <button id="btnRoleAdmin" onclick="app.requestAdminAccess()" class="py-2 px-3 rounded-xl text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center justify-center space-x-2 relative active:scale-95">
+            <i class="fa-solid fa-lock text-[10px] text-amber-400" id="adminLockIcon"></i>
+            <span>Admin</span>
+            <span id="adminAlertBadge" class="hidden absolute -top-1 -right-1 bg-rose-600 text-white text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border-2 border-slate-950 shadow">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin Header Lock Strip -->
+      <div id="adminLockHeaderStrip" class="hidden bg-indigo-950 px-3.5 py-1.5 border-t border-indigo-800 flex justify-between items-center text-xs">
+        <span class="text-indigo-200 font-bold flex items-center">
+          <i class="fa-solid fa-shield-halved text-emerald-400 mr-1.5"></i> Admin Console Active
+        </span>
+        <button onclick="app.lockAdminAccess()" class="bg-rose-900/80 hover:bg-rose-800 text-rose-200 text-[10px] font-extrabold px-2.5 py-0.5 rounded-md border border-rose-500/40 transition-colors flex items-center space-x-1 active:scale-95">
+          <i class="fa-solid fa-lock text-[10px]"></i>
+          <span>Lock</span>
+        </button>
+      </div>
+
+      <!-- Meal Service Timings Banner -->
+      <div class="bg-slate-950 px-3.5 py-1.5 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-300 font-semibold overflow-x-auto no-scrollbar whitespace-nowrap">
+        <span class="flex items-center text-amber-400 font-bold"><i class="fa-solid fa-clock mr-1"></i> Timings:</span>
+        <span class="bg-slate-900 px-2 py-0.5 rounded-md text-amber-200 border border-slate-800">🥣 Breakfast: <strong id="timingBreakfast">9:30 AM - 11:00 AM</strong></span>
+        <span class="bg-slate-900 px-2 py-0.5 rounded-md text-amber-200 border border-slate-800 ml-1.5">🍱 Lunch: <strong id="timingLunch">1:45 PM - 3:30 PM</strong></span>
+        <span class="bg-slate-900 px-2 py-0.5 rounded-md text-amber-200 border border-slate-800 ml-1.5">🍲 Dinner: <strong id="timingDinner">8:00 PM - 10:00 PM</strong></span>
+      </div>
+    </header>
+
+    <!-- MAIN APP CONTENT CONTAINER -->
+    <main class="flex-1 p-3.5 overflow-y-auto no-scrollbar space-y-4 gpu-layer" id="mainContent">
+      <div class="py-16 text-center text-slate-400">
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-orange-500 mb-3"></i>
+        <p class="text-xs font-bold tracking-wide">Loading AMUKC Dinning Portal...</p>
+      </div>
+    </main>
+
+    <!-- BOTTOM NAVIGATION BAR -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-slate-200 z-30 shadow-2xl gpu-layer">
+      <!-- Student Bottom Navigation Label -->
+      <div id="studentNav" class="py-2.5 text-center text-xs font-bold text-orange-600 flex items-center justify-center space-x-2">
+        <i class="fa-solid fa-calendar-check text-sm"></i>
+        <span>AMUKC Student Meal Planner</span>
+      </div>
+
+      <!-- Admin Bottom Navigation Tabs -->
+      <div id="adminNav" class="hidden grid grid-cols-2 text-center py-2">
+        <button onclick="app.setAdminTab('alerts')" id="tabAdminAlerts" class="py-1 flex flex-col items-center text-indigo-600 font-bold text-xs relative active:scale-95 transition-transform">
+          <i class="fa-solid fa-triangle-exclamation text-base mb-0.5"></i>
+          <span>Refusal Alerts</span>
+          <span id="alertsTabDot" class="hidden absolute top-1 right-12 w-2 h-2 bg-rose-500 rounded-full animate-ping"></span>
+        </button>
+        <button onclick="app.setAdminTab('menu')" id="tabAdminMenu" class="py-1 flex flex-col items-center text-slate-500 font-medium text-xs hover:text-slate-800 active:scale-95 transition-transform">
+          <i class="fa-solid fa-pen-to-square text-base mb-0.5"></i>
+          <span>Edit Menu</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- FLOATING TOAST STACK -->
+    <div id="toastContainer" class="fixed top-24 left-1/2 -translate-x-1/2 z-50 w-full max-w-xs px-4 pointer-events-none transition-all duration-300"></div>
+
+    <!-- MODAL: ADMIN SECURITY AUTHENTICATION -->
+    <div id="modalAdminAuth" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-xs p-5 shadow-2xl border border-slate-200 text-center text-slate-800">
+        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl border border-indigo-200">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <h3 class="font-black text-slate-900 text-base">Admin Security Check</h3>
+        <p class="text-xs text-slate-500 mt-1 mb-4">Enter security password to access Admin Console.</p>
+
+        <form onsubmit="app.verifyAdminPassword(event)" class="space-y-3">
+          <div>
+            <div class="relative">
+              <input type="password" id="adminPasswordInput" placeholder="Enter Password" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-center text-sm font-bold tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+              <button type="button" onclick="app.togglePasswordVisibility()" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 text-xs">
+                <i class="fa-solid fa-eye" id="passwordEyeIcon"></i>
+              </button>
+            </div>
+            <p id="passwordErrorMsg" class="hidden text-rose-600 font-bold text-[11px] mt-1.5 flex items-center justify-center space-x-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              <span>Incorrect Password! (AMUKC2026)</span>
+            </p>
+          </div>
+
+          <div class="pt-2 flex space-x-2">
+            <button type="button" onclick="app.closeModal('modalAdminAuth')" class="w-1/2 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 active:scale-95 transition-transform">Cancel</button>
+            <button type="submit" class="w-1/2 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl text-xs font-extrabold hover:from-indigo-700 hover:to-indigo-800 shadow-md shadow-indigo-600/30 active:scale-95 transition-all">Unlock</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL: EDIT MENU DISH -->
+    <div id="modalEditMenu" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-xs p-5 shadow-2xl border border-slate-200 text-slate-800">
+        <h3 class="font-black text-slate-900 text-base mb-3" id="editMenuTitle">Edit Meal Dish</h3>
+
+        <form onsubmit="app.handleSaveMenuEdit(event)" class="space-y-3">
+          <input type="hidden" id="editDayId">
+          <input type="hidden" id="editMealType">
+
+          <div>
+            <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Meal Dish Description</label>
+            <input type="text" id="editMealTitleInput" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Diet Choice Option</label>
+            <select id="editMealHasChoice" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500">
+              <option value="false">Standard Meal (No Veg Choice)</option>
+              <option value="true">Veg / Non-Veg Option (Paneer / Chicken)</option>
+            </select>
+          </div>
+
+          <div class="pt-2 flex space-x-2">
+            <button type="button" onclick="app.closeModal('modalEditMenu')" class="w-1/2 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200">Cancel</button>
+            <button type="submit" class="w-1/2 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl text-xs font-extrabold shadow-md">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL: EDIT SERVICE TIMINGS -->
+    <div id="modalEditTimings" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-xs p-5 shadow-2xl border border-slate-200 text-slate-800">
+        <h3 class="font-black text-slate-900 text-base mb-3">Edit Mess Service Hours</h3>
+
+        <form onsubmit="app.handleSaveTimings(event)" class="space-y-3">
+          <div>
+            <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Breakfast Timing</label>
+            <input type="text" id="inputTimingBreakfast" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Lunch Timing</label>
+            <input type="text" id="inputTimingLunch" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Dinner Timing</label>
+            <input type="text" id="inputTimingDinner" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500">
+          </div>
+
+          <div class="pt-2 flex space-x-2">
+            <button type="button" onclick="app.closeModal('modalEditTimings')" class="w-1/2 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200">Cancel</button>
+            <button type="submit" class="w-1/2 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl text-xs font-extrabold shadow-md">Update Hours</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FIREBASE WEBSOCKET REALTIME SYNC & APPLICATION CORE SCRIPT -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+    const ADMIN_PASSWORD_KEY = 'AMUKC2026';
+    const MESS_CODE = 'AMUKC2026';
+
+    const DEFAULT_TIMINGS = {
+      breakfast: "9:30 AM - 11:00 AM",
+      lunch: "1:45 PM - 3:30 PM",
+      dinner: "8:00 PM - 10:00 PM"
+    };
+
+    const DAYS_CONFIG = [
+      { id: 'mon', name: 'Monday', short: 'Mon' },
+      { id: 'tue', name: 'Tuesday', short: 'Tue' },
+      { id: 'wed', name: 'Wednesday', short: 'Wed' },
+      { id: 'thu', name: 'Thursday', short: 'Thu' },
+      { id: 'fri', name: 'Friday', short: 'Fri' },
+      { id: 'sat', name: 'Saturday', short: 'Sat' },
+      { id: 'sun', name: 'Sunday', short: 'Sun' }
+    ];
+
+    const DEFAULT_MENU = {
+      mon: {
+        breakfast: { name: 'Anda Paratha' },
+        lunch: { name: 'Chane Ki Daal, Roti' },
+        dinner: { name: 'Aloo Methi, Dal, Rice, Roti' }
+      },
+      tue: {
+        breakfast: { name: 'Sabzi Poori' },
+        lunch: { name: 'Aloo Tamatar, Daal, Rice, Roti' },
+        dinner: { name: 'Egg Curry, Roti, Rice' }
+      },
+      wed: {
+        breakfast: { name: 'Aloo Paratha' },
+        lunch: { name: 'Daal, Bhindi, Rice, Roti' },
+        dinner: { name: 'Chicken / Paneer Biryani', hasVegChoice: true }
+      },
+      thu: {
+        breakfast: { name: 'Anda Paratha' },
+        lunch: { name: 'Matar Pulao' },
+        dinner: { name: 'Kala chana, Poori' }
+      },
+      fri: {
+        breakfast: { name: 'Halwa Poori' },
+        lunch: { name: 'Chicken / Paneer Biryani', hasVegChoice: true },
+        dinner: { name: 'Aloo Dum, Rice, Roti' }
+      },
+      sat: {
+        breakfast: { name: 'Aloo Paratha' },
+        lunch: { name: 'Aloo Tamatar, Daal, Rice, Roti' },
+        dinner: { name: 'Chole, Rice, Roti' }
+      },
+      sun: {
+        breakfast: { name: 'Chole Bhature' },
+        lunch: { name: 'Masoor Dal, Chokha, Roti, Rice' },
+        dinner: { name: 'Chicken Korma / Paneer', hasVegChoice: true }
+      }
+    };
+    
+    const firebaseConfig = typeof __firebase_config !== 'undefined' 
+      ? JSON.parse(__firebase_config) 
+      : {
+          apiKey: "AIzaSyD7mB88sbpMQZl8HsWDTFrCsExLRSZtHSk",
+          authDomain: "amukc-dinning.firebaseapp.com",
+          databaseURL: "https://amukc-dinning-default-rtdb.firebaseio.com",
+          projectId: "amukc-dinning",
+          storageBucket: "amukc-dinning.firebasestorage.app",
+          messagingSenderId: "474331563181",
+          appId: "1:474331563181:web:f0c533f6f9993278727224"
+        };
+
+    const fbApp = initializeApp(firebaseConfig);
+    const auth = getAuth(fbApp);
+    const rtdb = getDatabase(fbApp);
+
+    class MessApp {
+      constructor() {
+        this.role = 'student';
+        this.isAdminAuthenticated = false;
+        this.adminTab = 'alerts';
+
+        // Auto-detect current day of week
+        const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+        const todayIndex = new Date().getDay();
+        this.selectedDayId = dayKeys[todayIndex] || 'mon';
+
+        let devId = localStorage.getItem('mess_device_id');
+        if (!devId) {
+          devId = 'dev_' + Math.random().toString(36).substring(2, 9);
+          localStorage.setItem('mess_device_id', devId);
+        }
+        this.deviceId = devId;
+
+        this.menu = DEFAULT_MENU;
+        this.timings = DEFAULT_TIMINGS;
+
+        // Daily Auto Reset Verification
+        this.verifyDailyReset();
+
+        // Persistent Local Cache
+        const cachedRsvps = localStorage.getItem('amukc_rsvps_cache');
+        this.rsvps = cachedRsvps ? JSON.parse(cachedRsvps) : {};
+
+        const cachedResolved = localStorage.getItem('amukc_resolved_alerts');
+        this.resolvedAlerts = cachedResolved ? JSON.parse(cachedResolved) : {};
+
+        // Offline Queue
+        this.pendingQueue = JSON.parse(localStorage.getItem('mess_pending_queue') || '[]');
+
+        try {
+          this.broadcastChannel = new BroadcastChannel('amukc_sync_channel');
+          this.broadcastChannel.onmessage = (e) => {
+            if (e.data && e.data.type === 'SYNC_REFRESH') {
+              this.render();
+            }
+          };
+        } catch(e) {}
+      }
+
+      verifyDailyReset() {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const lastDate = localStorage.getItem('amukc_last_active_date');
+        if (lastDate && lastDate !== todayStr) {
+          localStorage.removeItem('amukc_rsvps_cache');
+          this.rsvps = {};
+          localStorage.setItem('amukc_last_active_date', todayStr);
+        } else if (!lastDate) {
+          localStorage.setItem('amukc_last_active_date', todayStr);
+        }
+      }
+
+      async init() {
+        // Prevent multi-touch zoom and pinch zoom
+        document.addEventListener('touchstart', (e) => {
+          if (e.touches.length > 1) {
+            e.preventDefault();
+          }
+        }, { passive: false });
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+          const now = Date.now();
+          if (now - lastTouchEnd <= 300) {
+            e.preventDefault();
+          }
+          lastTouchEnd = now;
+        }, false);
+
+        // Prevent Copy, Cut & Context Menu
+        document.addEventListener('copy', (e) => e.preventDefault());
+        document.addEventListener('cut', (e) => e.preventDefault());
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        // Render immediately from local memory
+        this.updateHeaderTimings();
+        this.render();
+
+        // Connectivity Listeners
+        window.addEventListener('online', () => {
+          this.updateNetworkStatusUI(true);
+          this.showToast('📶 Online Connection Restored! Syncing...', 'info');
+          this.processPendingQueue();
+        });
+
+        window.addEventListener('offline', () => {
+          this.updateNetworkStatusUI(false);
+          this.showToast('⚡ Offline Mode: Responses will auto-sync when online', 'warning');
+        });
+
+        // Setup Instant Firebase Realtime WebSocket Connection
+        try {
+          this.setupRealtimeWebSockets();
+        } catch (err) {
+          console.warn("WebSocket setup warning:", err);
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+          if (user) {
+            this.updateNetworkStatusUI(navigator.onLine);
+            await this.processPendingQueue();
+            this.render();
+          }
+        });
+
+        try {
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(auth, __initial_auth_token);
+          } else {
+            await signInAnonymously(auth);
+          }
+        } catch (err) {
+          console.warn("Firebase Auth fallback mode active:", err);
+          this.updateNetworkStatusUI(navigator.onLine);
+          this.render();
+        }
+      }
+
+      updateNetworkStatusUI(isOnline) {
+        const dot = document.getElementById('networkStatusDot');
+        const title = document.getElementById('headerSubTitle');
+        if (!dot || !title) return;
+
+        const pendingCount = this.pendingQueue.length;
+
+        if (isOnline) {
+          if (pendingCount > 0) {
+            dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
+            title.className = 'text-amber-400 font-bold';
+            title.innerText = `Syncing (${pendingCount} Pending)...`;
+          } else {
+            dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+            title.className = 'text-emerald-400/90';
+            title.innerText = this.role === 'student' ? 'Instant WebSocket Synced' : 'Admin Console Active';
+          }
+        } else {
+          dot.className = 'w-2 h-2 rounded-full bg-rose-500 animate-pulse';
+          title.className = 'text-rose-400 font-bold';
+          title.innerText = pendingCount > 0 ? `Offline (${pendingCount} Queued)` : 'Offline Mode';
+        }
+      }
+
+      // INSTANT SUB-SECOND WEBSOCKET LISTENER ENGINE
+      setupRealtimeWebSockets() {
+        if (this.hasSetupWebsockets) return;
+        this.hasSetupWebsockets = true;
+
+        // 1. Instant WebSocket listener for RSVP changes across all devices
+        const rsvpsRef = ref(rtdb, 'rsvps');
+        onValue(rsvpsRef, (snapshot) => {
+          const cloudData = snapshot.val();
+          if (cloudData) {
+            let hasNewRefusal = false;
+            const updatedRsvps = { ...this.rsvps };
+
+            Object.keys(cloudData).forEach(docId => {
+              const item = cloudData[docId];
+              if (item && item.studentId) {
+                const alertId = `optout_${docId}`;
+
+                // Instant alert notification if new refusal from another device
+                if (item.status === 'skipping' && item.studentId !== this.deviceId && (!this.rsvps[docId] || this.rsvps[docId].status !== 'skipping') && !this.resolvedAlerts[alertId]) {
+                  hasNewRefusal = true;
+                  const devTag = 'Student (' + (item.studentId || '').slice(-4) + ')';
+                  const day = DAYS_CONFIG.find(d => d.id === item.dayId) || { name: item.dayId };
+                  this.showToast(`🚨 INSTANT ALERT: ${devTag} marked SKIPPING for ${day.name} ${item.mealType.toUpperCase()}!`, 'warning');
+                }
+                updatedRsvps[docId] = item;
+              }
+            });
+
+            this.rsvps = updatedRsvps;
+            localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
+            
+            if (hasNewRefusal) {
+              this.playAudioChime('alert');
+            }
+            this.render();
+          }
+        });
+
+        // 2. Instant WebSocket listener for Resolved Alerts state
+        const resolvedRef = ref(rtdb, 'resolvedAlerts');
+        onValue(resolvedRef, (snapshot) => {
+          const cloudResolved = snapshot.val() || {};
+          this.resolvedAlerts = cloudResolved;
+          localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
+          this.render();
+        });
+      }
+
+      async processPendingQueue() {
+        if (!navigator.onLine || this.pendingQueue.length === 0) return;
+
+        const queueToProcess = [...this.pendingQueue];
+        this.pendingQueue = [];
+        localStorage.setItem('mess_pending_queue', JSON.stringify([]));
+        this.updateNetworkStatusUI(true);
+
+        let syncedCount = 0;
+        for (const item of queueToProcess) {
+          try {
+            if (item.type === 'rsvp') {
+              const singleRef = ref(rtdb, `rsvps/${item.docKey}`);
+              await set(singleRef, item.record);
+              syncedCount++;
+            }
+          } catch (e) {
+            this.pendingQueue.push(item);
+          }
+        }
+
+        localStorage.setItem('mess_pending_queue', JSON.stringify(this.pendingQueue));
+        this.updateNetworkStatusUI(navigator.onLine);
+
+        if (syncedCount > 0) {
+          this.showToast(`✅ Auto-Synced ${syncedCount} response(s) to cloud!`, 'success');
+          this.playAudioChime('success');
+        }
+      }
+
+      playAudioChime(type = 'alert') {
+        try {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContext) return;
+          const ctx = new AudioContext();
+
+          if (type === 'alert') {
+            const osc1 = ctx.createOscillator();
+            const osc2 = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc1.type = 'triangle';
+            osc2.type = 'sine';
+
+            osc1.frequency.setValueAtTime(659.25, ctx.currentTime);
+            osc1.frequency.setValueAtTime(880, ctx.currentTime + 0.15);
+
+            osc2.frequency.setValueAtTime(329.63, ctx.currentTime);
+            osc2.frequency.setValueAtTime(440, ctx.currentTime + 0.15);
+
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+
+            osc1.connect(gain);
+            osc2.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc1.start(ctx.currentTime);
+            osc2.start(ctx.currentTime);
+            osc1.stop(ctx.currentTime + 0.4);
+            osc2.stop(ctx.currentTime + 0.4);
+          } else {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.25);
+          }
+        } catch(e) {}
+      }
+
+      updateHeaderTimings() {
+        document.getElementById('timingBreakfast').innerText = this.timings.breakfast || DEFAULT_TIMINGS.breakfast;
+        document.getElementById('timingLunch').innerText = this.timings.lunch || DEFAULT_TIMINGS.lunch;
+        document.getElementById('timingDinner').innerText = this.timings.dinner || DEFAULT_TIMINGS.dinner;
+      }
+
+      requestAdminAccess() {
+        if (this.role === 'admin') return;
+
+        if (this.isAdminAuthenticated) {
+          this.switchRole('admin');
+        } else {
+          document.getElementById('adminPasswordInput').value = '';
+          document.getElementById('passwordErrorMsg').classList.add('hidden');
+          this.openModal('modalAdminAuth');
+        }
+      }
+
+      verifyAdminPassword(e) {
+        e.preventDefault();
+        const enteredPassword = document.getElementById('adminPasswordInput').value.trim();
+
+        if (enteredPassword === ADMIN_PASSWORD_KEY) {
+          this.isAdminAuthenticated = true;
+          this.closeModal('modalAdminAuth');
+          this.switchRole('admin');
+          this.playAudioChime('success');
+          this.showToast('🔓 Admin Console Unlocked!', 'success');
+        } else {
+          document.getElementById('passwordErrorMsg').classList.remove('hidden');
+          this.playAudioChime('alert');
+          this.showToast('❌ Incorrect Password! (AMUKC2026)', 'warning');
+        }
+      }
+
+      togglePasswordVisibility() {
+        const input = document.getElementById('adminPasswordInput');
+        const icon = document.getElementById('passwordEyeIcon');
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.className = 'fa-solid fa-eye-slash';
+        } else {
+          input.type = 'password';
+          icon.className = 'fa-solid fa-eye';
+        }
+      }
+
+      lockAdminAccess() {
+        this.isAdminAuthenticated = false;
+        this.switchRole('student');
+        this.showToast('🔒 Admin Console Locked', 'info');
+      }
+
+      switchRole(role) {
+        this.role = role;
+        
+        const btnStudent = document.getElementById('btnRoleStudent');
+        const btnAdmin = document.getElementById('btnRoleAdmin');
+        const lockIcon = document.getElementById('adminLockIcon');
+        const lockHeaderStrip = document.getElementById('adminLockHeaderStrip');
+        const sNav = document.getElementById('studentNav');
+        const aNav = document.getElementById('adminNav');
+        const subTitle = document.getElementById('headerSubTitle');
+
+        if (role === 'student') {
+          btnStudent.className = 'py-2 px-3 rounded-xl text-xs font-extrabold transition-all duration-200 flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md active:scale-95';
+          btnAdmin.className = 'py-2 px-3 rounded-xl text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center justify-center space-x-2 relative active:scale-95';
+          
+          if (this.isAdminAuthenticated) {
+            lockIcon.className = 'fa-solid fa-unlock text-[10px] text-emerald-400';
+          } else {
+            lockIcon.className = 'fa-solid fa-lock text-[10px] text-amber-400';
+          }
+
+          lockHeaderStrip.classList.add('hidden');
+          sNav.classList.remove('hidden');
+          sNav.classList.add('flex');
+          aNav.classList.add('hidden');
+          aNav.classList.remove('grid');
+          subTitle.innerText = 'Instant WebSocket Synced';
+        } else {
+          btnStudent.className = 'py-2 px-3 rounded-xl text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center justify-center space-x-2 active:scale-95';
+          btnAdmin.className = 'py-2 px-3 rounded-xl text-xs font-extrabold transition-all duration-200 flex items-center justify-center space-x-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-md active:scale-95';
+          lockIcon.className = 'fa-solid fa-unlock text-[10px] text-emerald-400';
+
+          lockHeaderStrip.classList.remove('hidden');
+          sNav.classList.add('hidden');
+          sNav.classList.remove('flex');
+          aNav.classList.remove('hidden');
+          aNav.classList.add('grid');
+          subTitle.innerText = 'Admin Console';
+        }
+
+        this.render();
+      }
+
+      setAdminTab(tab) {
+        this.adminTab = tab;
+        ['alerts', 'menu'].forEach(t => {
+          const btn = document.getElementById(`tabAdmin${t.charAt(0).toUpperCase() + t.slice(1)}`);
+          if (btn) {
+            btn.className = t === tab
+              ? 'py-1 flex flex-col items-center text-indigo-600 font-bold text-xs active:scale-95 transition-transform'
+              : 'py-1 flex flex-col items-center text-slate-500 font-medium text-xs hover:text-slate-800 active:scale-95 transition-transform';
+          }
+        });
+        this.render();
+      }
+
+      getUnresolvedAlerts() {
+        let alerts = [];
+
+        Object.keys(this.rsvps).forEach(docId => {
+          const item = this.rsvps[docId];
+          if (item && item.status === 'skipping') {
+            const alertId = `optout_${docId}`;
+            if (!this.resolvedAlerts[alertId]) {
+              const devTag = 'Student (' + (item.studentId || '').slice(-4) + ')';
+              const day = DAYS_CONFIG.find(d => d.id === item.dayId) || { name: item.dayId };
+              const meal = this.menu[item.dayId]?.[item.mealType] || { name: 'Meal' };
+
+              alerts.push({
+                id: alertId,
+                docKey: docId,
+                type: 'opt_out',
+                studentTag: devTag,
+                dayName: day.name,
+                mealType: item.mealType,
+                mealName: meal.name,
+                title: `${devTag} marked SKIPPING for ${day.name} ${item.mealType.toUpperCase()}`,
+                desc: `Dish: "${meal.name}". Student indicated they will not consume this meal.`,
+                badgeText: 'Meal Skipping Refusal',
+                timeText: item.updatedAt ? new Date(item.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'RSVP Signal'
+              });
+            }
+          }
+        });
+
+        return alerts;
+      }
+
+      updateAlertBadges() {
+        const alerts = this.getUnresolvedAlerts();
+        const badge = document.getElementById('adminAlertBadge');
+        const dot = document.getElementById('alertsTabDot');
+        
+        if (alerts.length > 0) {
+          if (badge) {
+            badge.innerText = alerts.length;
+            badge.classList.remove('hidden');
+          }
+          if (dot) dot.classList.remove('hidden');
+        } else {
+          if (badge) badge.classList.add('hidden');
+          if (dot) dot.classList.add('hidden');
+        }
+      }
+
+      // TOGGLE RSVP WITH UN-TOGGLE SUPPORT & INSTANT WEBSOCKET SYNC
+      async toggleRsvp(dayId, mealType, targetStatus) {
+        const studentId = this.deviceId;
+        const docKey = `${studentId}_${dayId}_${mealType}`;
+        const existingDoc = this.rsvps[docKey] || {};
+
+        // If user clicks Skipping Meal again when already skipping, toggle back to eating
+        let newStatus = targetStatus;
+        if (existingDoc.status === targetStatus && targetStatus === 'skipping') {
+          newStatus = 'eating';
+        }
+
+        const alertId = `optout_${docKey}`;
+        if (newStatus === 'eating') {
+          delete this.resolvedAlerts[alertId];
+          localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
+        }
+
+        const updatedRecord = {
+          studentId: studentId,
+          messCode: MESS_CODE,
+          dayId: dayId,
+          mealType: mealType,
+          status: newStatus,
+          choice: existingDoc.choice || 'Paneer',
+          updatedAt: Date.now(),
+          dateStamp: new Date().toISOString().split('T')[0]
+        };
+
+        // 1. Instant local state update
+        this.rsvps[docKey] = updatedRecord;
+        localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
+        this.render();
+
+        // 2. Sub-50ms Instant WebSocket Write to Firebase Realtime Database
+        if (navigator.onLine) {
+          try {
+            const singleRef = ref(rtdb, `rsvps/${docKey}`);
+            await set(singleRef, updatedRecord);
+
+            if (newStatus === 'eating') {
+              const alertRef = ref(rtdb, `resolvedAlerts/${alertId}`);
+              await set(alertRef, null);
+            }
+          } catch (err) {
+            this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
+          }
+        } else {
+          this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
+        }
+
+        if (this.broadcastChannel) {
+          this.broadcastChannel.postMessage({ type: 'SYNC_REFRESH' });
+        }
+
+        if (newStatus === 'skipping') {
+          const isOff = !navigator.onLine;
+          this.showToast(isOff ? '⚡ Saved offline: Skipped response queued' : '🚨 Skipped signal sent to Admin', 'warning');
+        } else {
+          const isOff = !navigator.onLine;
+          this.showToast(isOff ? '⚡ Saved offline: Attendance saved' : '✅ Will Eat confirmed for ' + mealType.toUpperCase(), 'success');
+          this.playAudioChime('success');
+        }
+      }
+
+      enqueuePendingItem(item) {
+        this.pendingQueue = this.pendingQueue.filter(q => q.docKey !== item.docKey);
+        this.pendingQueue.push(item);
+        localStorage.setItem('mess_pending_queue', JSON.stringify(this.pendingQueue));
+        this.updateNetworkStatusUI(navigator.onLine);
+      }
+
+      async setItemChoice(dayId, mealType, choice) {
+        const studentId = this.deviceId;
+        const docKey = `${studentId}_${dayId}_${mealType}`;
+        const existingDoc = this.rsvps[docKey] || {};
+
+        const updatedRecord = {
+          studentId: studentId,
+          dayId: dayId,
+          mealType: mealType,
+          status: existingDoc.status || 'eating',
+          choice: choice,
+          updatedAt: Date.now(),
+          dateStamp: new Date().toISOString().split('T')[0]
+        };
+
+        this.rsvps[docKey] = updatedRecord;
+        localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
+        this.render();
+
+        if (navigator.onLine) {
+          try {
+            const singleRef = ref(rtdb, `rsvps/${docKey}`);
+            await set(singleRef, updatedRecord);
+          } catch(e) {
+            this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
+          }
+        } else {
+          this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
+        }
+
+        this.showToast(`Preference set to ${choice}`, 'info');
+      }
+
+      // RESOLVE ALERT & RESET MEAL RSVP TO WILL EAT ACROSS ALL DEVICES
+      async resolveAlert(alertId) {
+        if (alertId.startsWith('optout_')) {
+          const docKey = alertId.replace('optout_', '');
+          
+          // 1. Reset RSVP status back to 'eating' in local state & cache
+          if (this.rsvps[docKey]) {
+            this.rsvps[docKey].status = 'eating';
+            this.rsvps[docKey].updatedAt = Date.now();
+          } else {
+            const parts = docKey.split('_');
+            this.rsvps[docKey] = {
+              studentId: parts[0] || 'unknown',
+              dayId: parts[1] || 'mon',
+              mealType: parts[2] || 'lunch',
+              status: 'eating',
+              updatedAt: Date.now()
+            };
+          }
+          localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
+
+          // 2. Remove local resolved marker so student can skip again if needed
+          delete this.resolvedAlerts[alertId];
+          localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
+
+          // 3. Sync status reset to Firebase Realtime Database
+          if (navigator.onLine) {
+            try {
+              const singleRef = ref(rtdb, `rsvps/${docKey}`);
+              await set(singleRef, this.rsvps[docKey]);
+
+              const alertRef = ref(rtdb, `resolvedAlerts/${alertId}`);
+              await set(alertRef, null);
+            } catch(e) {
+              console.warn("Firebase sync error on resolve:", e);
+            }
+          }
+        } else {
+          this.resolvedAlerts[alertId] = true;
+          localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
+        }
+
+        this.render();
+        if (this.broadcastChannel) {
+          this.broadcastChannel.postMessage({ type: 'SYNC_REFRESH' });
+        }
+        this.showToast('✅ Alert Resolved! Student meal reset to "Will Eat" & Skipping option re-enabled', 'success');
+        this.playAudioChime('success');
+      }
+
+      // RENDER ROUTER
+      render() {
+        const container = document.getElementById('mainContent');
+        if (!container) return;
+        this.updateAlertBadges();
+
+        if (this.role === 'student') {
+          container.innerHTML = this.renderStudentRsvpView();
+        } else {
+          if (this.adminTab === 'alerts') {
+            container.innerHTML = this.renderAdminAlertsView();
+          } else {
+            container.innerHTML = this.renderAdminMenuView();
+          }
+        }
+      }
+
+      // --- STUDENT VIEW RENDER ---
+      renderStudentRsvpView() {
+        return `
+          <!-- Day Selector Bar -->
+          <div class="flex space-x-1.5 overflow-x-auto no-scrollbar py-1">
+            ${DAYS_CONFIG.map(d => `
+              <button onclick="app.selectedDayId = '${d.id}'; app.render();" class="px-3.5 py-2 rounded-2xl text-xs font-extrabold transition-all flex-1 min-w-[55px] text-center active:scale-95 ${this.selectedDayId === d.id ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md ring-2 ring-emerald-500/50' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}">
+                <div>${d.short}</div>
+              </button>
+            `).join('')}
+          </div>
+
+          <!-- Day Menu & Attendance List -->
+          <div class="space-y-3">
+            <div class="flex justify-between items-center px-1">
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-500">
+                ${DAYS_CONFIG.find(d => d.id === this.selectedDayId)?.name}'s Mess Menu
+              </h3>
+              <span class="text-[10px] font-extrabold bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-300 flex items-center space-x-1">
+                <i class="fa-solid fa-bolt text-[9px] animate-pulse"></i>
+                <span>Instant WebSocket</span>
+              </span>
+            </div>
+
+            ${['breakfast', 'lunch', 'dinner'].map(mealType => {
+              const meal = this.menu[this.selectedDayId]?.[mealType] || { name: 'Standard Meal' };
+              const studentId = this.deviceId;
+              const rsvpKey = `${studentId}_${this.selectedDayId}_${mealType}`;
+              const rsvpItem = this.rsvps[rsvpKey] || {};
+              const isEating = (rsvpItem.status || 'eating') === 'eating';
+              const mealTime = this.timings[mealType] || DEFAULT_TIMINGS[mealType];
+              const currentChoice = rsvpItem.choice || 'Paneer';
+
+              const icons = { breakfast: '🍳', lunch: '🍱', dinner: '🍲' };
+
+              return `
+                <div class="bg-white rounded-3xl p-4 border ${isEating ? 'border-slate-200' : 'border-rose-300 bg-rose-50/40'} shadow-md space-y-3 transition-all gpu-layer">
+                  <div class="flex items-start justify-between">
+                    <div class="flex items-center space-x-3">
+                      <div class="text-3xl p-2.5 rounded-2xl ${isEating ? 'bg-orange-50 text-orange-600 border border-orange-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}">
+                        ${icons[mealType]}
+                      </div>
+                      <div>
+                        <div class="flex items-center space-x-2">
+                          <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">${mealType}</span>
+                          <span class="text-[10px] text-amber-800 font-extrabold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">${mealTime}</span>
+                        </div>
+                        <h4 class="font-black text-slate-900 text-base leading-snug mt-0.5">${meal.name}</h4>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Diet Choice Option -->
+                  ${meal.hasVegChoice ? `
+                    <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-200 flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-700">Choose Diet Option:</span>
+                      <div class="flex space-x-1">
+                        <button onclick="app.setItemChoice('${this.selectedDayId}', '${mealType}', 'Paneer')" class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center space-x-1 active:scale-95 ${currentChoice === 'Paneer' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-300'}">
+                          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                          <span>Paneer (Veg)</span>
+                        </button>
+                        <button onclick="app.setItemChoice('${this.selectedDayId}', '${mealType}', 'Chicken')" class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center space-x-1 active:scale-95 ${currentChoice === 'Chicken' ? 'bg-rose-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-300'}">
+                          <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                          <span>Chicken (Non-Veg)</span>
+                        </button>
+                      </div>
+                    </div>
+                  ` : ''}
+
+                  <!-- RSVP Buttons -->
+                  <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100">
+                    <button onclick="app.toggleRsvp('${this.selectedDayId}', '${mealType}', 'eating')" class="py-2.5 px-3 rounded-2xl font-black text-xs flex items-center justify-center space-x-1.5 transition-all active:scale-95 ${isEating ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md ring-2 ring-emerald-500/30' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+                      <i class="fa-solid fa-circle-check text-sm"></i>
+                      <span>Will Eat</span>
+                    </button>
+
+                    <button onclick="app.toggleRsvp('${this.selectedDayId}', '${mealType}', 'skipping')" class="py-2.5 px-3 rounded-2xl font-black text-xs flex items-center justify-center space-x-1.5 transition-all active:scale-95 ${!isEating ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md ring-2 ring-rose-500/30' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+                      <i class="fa-solid fa-circle-xmark text-sm"></i>
+                      <span>Skipping Meal</span>
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      // --- ADMIN VIEWS RENDER ---
+      renderAdminAlertsView() {
+        const alerts = this.getUnresolvedAlerts();
+        const totalResponding = new Set(Object.values(this.rsvps).map(r => r.studentId)).size;
+
+        return `
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-2 gap-2.5 gpu-layer">
+            <div class="bg-slate-900 text-white rounded-3xl p-4 shadow-md border border-slate-800">
+              <span class="text-[10px] font-bold text-orange-400 uppercase tracking-wider">Active Devices</span>
+              <div class="text-2xl font-black mt-0.5 text-white">${totalResponding}</div>
+              <span class="text-[10px] text-slate-400">Responding Students</span>
+            </div>
+            
+            <div class="bg-gradient-to-br from-rose-600 to-rose-700 text-white rounded-3xl p-4 shadow-md alert-pulse border border-rose-500/40">
+              <span class="text-[10px] font-bold text-rose-100 uppercase tracking-wider">Refusal Alerts</span>
+              <div class="text-2xl font-black mt-0.5">${alerts.length}</div>
+              <span class="text-[10px] text-rose-100 font-semibold">Skipping Meals</span>
+            </div>
+          </div>
+
+          <!-- Live Alert Feed -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between px-1">
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center space-x-1.5">
+                <i class="fa-solid fa-bell text-rose-600"></i>
+                <span>Meal Refusal Alerts</span>
+              </h3>
+              <span class="text-[11px] text-slate-500 font-bold">${alerts.length} Active</span>
+            </div>
+
+            ${alerts.length === 0 ? `
+              <div class="bg-emerald-50 border border-emerald-200 rounded-3xl p-6 text-center">
+                <div class="text-3xl mb-2">✅</div>
+                <h4 class="font-bold text-emerald-800 text-sm">No Active Refusal Alerts</h4>
+                <p class="text-xs text-emerald-600 mt-1">All children are attending scheduled meals normally.</p>
+              </div>
+            ` : alerts.map(alert => `
+              <div class="bg-white rounded-3xl p-4 border-2 border-rose-400 shadow-md space-y-2.5 relative overflow-hidden gpu-layer">
+                <div class="absolute top-0 left-0 bottom-0 w-1.5 bg-rose-500"></div>
+
+                <div class="flex justify-between items-start pl-2">
+                  <div>
+                    <span class="bg-rose-100 text-rose-800 border border-rose-300 text-[10px] font-black uppercase px-2 py-0.5 rounded-full inline-block mb-1">
+                      🚨 ${alert.badgeText}
+                    </span>
+                    <h4 class="font-black text-slate-900 text-sm">${alert.title}</h4>
+                    <p class="text-xs font-bold text-slate-500">${alert.dayName} (${alert.mealType.toUpperCase()})</p>
+                  </div>
+                  <span class="text-[10px] text-slate-400 font-semibold">${alert.timeText}</span>
+                </div>
+
+                <p class="text-xs text-slate-700 pl-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200 font-medium">${alert.desc}</p>
+
+                <div class="flex justify-end space-x-2 pt-2 border-t border-slate-100">
+                  <button onclick="app.resolveAlert('${alert.id}')" class="px-3.5 py-1.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 shadow-sm flex items-center space-x-1.5 active:scale-95">
+                    <i class="fa-solid fa-check text-xs text-emerald-400"></i>
+                    <span>Acknowledge & Resolve</span>
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      renderAdminMenuView() {
+        return `
+          <div class="space-y-4 gpu-layer">
+            <div class="flex justify-between items-center px-1">
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-500">Weekly Mess Schedule Editor</h3>
+              <button onclick="app.openModal('modalEditTimings')" class="text-[11px] bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-3 py-1 rounded-xl shadow-sm active:scale-95 transition-transform">
+                <i class="fa-solid fa-clock mr-1 text-amber-400"></i> Timings
+              </button>
+            </div>
+
+            <!-- Day Selector -->
+            <div class="flex space-x-1.5 overflow-x-auto no-scrollbar py-1">
+              ${DAYS_CONFIG.map(d => `
+                <button onclick="app.selectedDayId = '${d.id}'; app.render();" class="px-3.5 py-2 rounded-2xl text-xs font-extrabold transition-all flex-1 min-w-[55px] text-center active:scale-95 ${this.selectedDayId === d.id ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}">
+                  <div>${d.short}</div>
+                </button>
+              `).join('')}
+            </div>
+
+            <!-- Editable Meal Cards -->
+            <div class="space-y-3">
+              ${['breakfast', 'lunch', 'dinner'].map(m => {
+                const meal = this.menu[this.selectedDayId]?.[m] || { name: '' };
+
+                return `
+                  <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm space-y-2">
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <span class="text-[10px] font-black uppercase text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">${m} (${this.timings[m] || ''})</span>
+                        <h4 class="font-extrabold text-slate-900 text-base mt-1">${meal.name}</h4>
+                        ${meal.hasVegChoice ? `<span class="inline-block mt-1 bg-emerald-50 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-200">Veg / Non-Veg Option Enabled</span>` : ''}
+                      </div>
+                      <button onclick="app.openEditMenuModal('${this.selectedDayId}', '${m}')" class="p-2.5 text-orange-600 hover:bg-slate-100 rounded-2xl transition-all active:scale-90">
+                        <i class="fa-solid fa-pen-to-square text-lg"></i>
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      openEditMenuModal(dayId, mealType) {
+        const meal = this.menu[dayId]?.[mealType] || { name: '' };
+        document.getElementById('editDayId').value = dayId;
+        document.getElementById('editMealType').value = mealType;
+        document.getElementById('editMealTitleInput').value = meal.name;
+        document.getElementById('editMealHasChoice').value = meal.hasVegChoice ? 'true' : 'false';
+        
+        document.getElementById('editMenuTitle').innerText = `Edit ${dayId.toUpperCase()} ${mealType.toUpperCase()}`;
+        this.openModal('modalEditMenu');
+      }
+
+      async handleSaveMenuEdit(e) {
+        e.preventDefault();
+        const dayId = document.getElementById('editDayId').value;
+        const mealType = document.getElementById('editMealType').value;
+        const name = document.getElementById('editMealTitleInput').value.trim();
+        const hasChoice = document.getElementById('editMealHasChoice').value === 'true';
+
+        const updatedDayObj = { ...(this.menu[dayId] || {}) };
+        updatedDayObj[mealType] = { name, hasVegChoice: hasChoice };
+
+        this.menu[dayId] = updatedDayObj;
+
+        if (navigator.onLine) {
+          try {
+            const menuRef = ref(rtdb, `menu/${dayId}`);
+            await set(menuRef, updatedDayObj);
+          } catch(e) {}
+        }
+
+        this.closeModal('modalEditMenu');
+        this.render();
+        this.showToast('Menu updated successfully!', 'success');
+      }
+
+      async handleSaveTimings(e) {
+        e.preventDefault();
+        const newTimings = {
+          breakfast: document.getElementById('inputTimingBreakfast').value.trim(),
+          lunch: document.getElementById('inputTimingLunch').value.trim(),
+          dinner: document.getElementById('inputTimingDinner').value.trim()
+        };
+
+        this.timings = newTimings;
+        this.updateHeaderTimings();
+
+        if (navigator.onLine) {
+          try {
+            const timingsRef = ref(rtdb, `timings/hours`);
+            await set(timingsRef, newTimings);
+          } catch(e) {}
+        }
+
+        this.closeModal('modalEditTimings');
+        this.render();
+        this.showToast('Mess service hours updated!', 'success');
+      }
+
+      openModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+        if (id === 'modalEditTimings') {
+          document.getElementById('inputTimingBreakfast').value = this.timings.breakfast || DEFAULT_TIMINGS.breakfast;
+          document.getElementById('inputTimingLunch').value = this.timings.lunch || DEFAULT_TIMINGS.lunch;
+          document.getElementById('inputTimingDinner').value = this.timings.dinner || DEFAULT_TIMINGS.dinner;
+        }
+      }
+
+      closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+      }
+
+      showToast(msg, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const toast = document.createElement('div');
+        
+        const bg = type === 'success' ? 'bg-emerald-600 text-white' : type === 'warning' ? 'bg-rose-600 text-white' : 'bg-slate-900 text-white';
+
+        toast.className = `${bg} px-4 py-3 rounded-2xl shadow-2xl text-xs font-bold flex items-center space-x-2 transition-all duration-300 transform translate-y-3 opacity-0 border border-white/20`;
+        toast.innerHTML = `<span>${msg}</span>`;
+
+        container.appendChild(toast);
+
+        requestAnimationFrame(() => {
+          toast.classList.remove('translate-y-3', 'opacity-0');
+        });
+
+        setTimeout(() => {
+          toast.classList.add('opacity-0', '-translate-y-3');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+    }
+
+    // Launch Application Safely Across All Document States
+    window.app = new MessApp();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => window.app.init());
+    } else {
+      window.app.init();
+    }
+  </script>
 </body>
 </html>
