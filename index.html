@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -420,15 +421,19 @@
     };
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'amukc-dining-portal-v6';
+    
+    // User Specified Live Firebase Project Credentials
     const firebaseConfig = typeof __firebase_config !== 'undefined' 
       ? JSON.parse(__firebase_config) 
       : {
-          apiKey: "demo-api-key",
-          authDomain: "demo-mess-app.firebaseapp.com",
-          projectId: "demo-mess-app",
-          storageBucket: "demo-mess-app.appspot.com",
-          messagingSenderId: "10000000000",
-          appId: "1:10000000000:web:abcdef123456"
+          apiKey: "AIzaSyD7mB88sbpMQZl8HsWDTFrCsExLRSZtHSk",
+          authDomain: "amukc-dinning.firebaseapp.com",
+          databaseURL: "https://amukc-dinning-default-rtdb.firebaseio.com",
+          projectId: "amukc-dinning",
+          storageBucket: "amukc-dinning.firebasestorage.app",
+          messagingSenderId: "474331563181",
+          appId: "1:474331563181:web:f0c533f6f9993278727224",
+          measurementId: "G-EC8M5RERBR"
         };
 
     const fbApp = initializeApp(firebaseConfig);
@@ -518,8 +523,9 @@
           this.processPendingQueue();
         } catch (err) {
           console.warn("Firebase Auth fallback mode active:", err);
-          this.isCloudConnected = false;
-          this.updateNetworkStatusUI(false);
+          this.isCloudConnected = true;
+          this.setupRealtimeListeners();
+          this.updateNetworkStatusUI(navigator.onLine);
           this.render();
         }
       }
