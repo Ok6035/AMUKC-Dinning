@@ -80,97 +80,13 @@
       <!-- ROW 1: Logo & Title Bar -->
       <div class="p-2.5 flex items-center space-x-3 border-b border-slate-800/80 bg-slate-950/90">
         
-        <!-- High-Precision Inline Vector Logo Badge -->
+        <!-- High-Precision Inline Canvas/HTML Logo Badge -->
         <div class="w-14 h-14 flex items-center justify-center shrink-0 overflow-hidden bg-gradient-to-b from-amber-50 to-amber-100 rounded-2xl border-2 border-amber-400 shadow-lg p-0.5">
-          <svg viewBox="0 0 500 350" class="w-full h-full object-contain" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="250" cy="175" rx="240" ry="160" fill="#fffbeb"/>
-            <ellipse cx="250" cy="175" rx="235" ry="155" fill="none" stroke="url(#goldGrad)" stroke-width="10"/>
-            <ellipse cx="250" cy="175" rx="225" ry="145" fill="none" stroke="#064e3b" stroke-width="3"/>
-
-            <defs>
-              <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#b45309"/>
-                <stop offset="50%" stop-color="#f59e0b"/>
-                <stop offset="100%" stop-color="#d97706"/>
-              </linearGradient>
-              <linearGradient id="domeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#064e3b"/>
-                <stop offset="50%" stop-color="#022c22"/>
-                <stop offset="100%" stop-color="#064e3b"/>
-              </linearGradient>
-            </defs>
-
-            <!-- Rising Steam Lines -->
-            <path d="M225,45 Q215,25 230,10 Q240,25 230,40" fill="none" stroke="#d97706" stroke-width="4" stroke-linecap="round"/>
-            <path d="M250,42 Q240,20 255,5 Q265,20 255,37" fill="none" stroke="#f59e0b" stroke-width="5" stroke-linecap="round"/>
-            <path d="M275,45 Q265,25 280,10 Q290,25 280,40" fill="none" stroke="#d97706" stroke-width="4" stroke-linecap="round"/>
-
-            <!-- Left Fork -->
-            <g fill="#064e3b">
-              <path d="M85,150 L115,80 L125,85 L95,155 Z"/>
-              <path d="M115,80 Q105,60 90,50 L85,55 Q98,63 105,82 Z"/>
-              <path d="M120,77 Q115,55 105,45 L100,48 Q108,58 112,78 Z"/>
-              <path d="M125,82 Q125,58 120,43 L115,45 Q118,58 118,80 Z"/>
-            </g>
-
-            <!-- Right Spoon -->
-            <g fill="#064e3b">
-              <path d="M415,150 L385,80 L375,85 L405,155 Z"/>
-              <ellipse cx="395" cy="55" rx="16" ry="24" transform="rotate(22 395 55)"/>
-            </g>
-
-            <!-- Cloche Dome Body -->
-            <path d="M140,135 Q140,48 250,48 Q360,48 360,135 Z" fill="url(#domeGrad)"/>
-            <path d="M140,135 Q140,55 250,55 Q360,55 360,135 Z" fill="none" stroke="#f59e0b" stroke-width="6"/>
-            <circle cx="250" cy="48" r="10" fill="url(#goldGrad)"/>
-
-            <!-- Heritage Building Silhouette -->
-            <g fill="#022c22">
-              <rect x="180" y="105" width="140" height="30"/>
-              <path d="M235,105 Q250,88 265,105 Z"/>
-              <rect x="185" y="90" width="8" height="15"/>
-              <polygon points="189,82 185,90 193,90"/>
-              <rect x="205" y="94" width="6" height="11"/>
-              <polygon points="208,87 205,94 211,94"/>
-              <rect x="289" y="94" width="6" height="11"/>
-              <polygon points="292,87 289,94 295,94"/>
-              <rect x="307" y="90" width="8" height="15"/>
-              <polygon points="311,82 307,90 315,90"/>
-              <path d="M238,135 L238,115 Q250,108 262,115 L262,135 Z" fill="#fffbeb"/>
-              <rect x="195" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
-              <rect x="210" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
-              <rect x="222" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
-              <rect x="270" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
-              <rect x="282" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
-              <rect x="297" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
-            </g>
-
-            <!-- Trees Flanking Monument -->
-            <circle cx="160" cy="120" r="14" fill="#064e3b"/>
-            <circle cx="170" cy="124" r="10" fill="#022c22"/>
-            <circle cx="340" cy="120" r="14" fill="#064e3b"/>
-            <circle cx="330" cy="124" r="10" fill="#022c22"/>
-
-            <!-- Platter Base Line -->
-            <rect x="90" y="135" width="320" height="7" rx="3.5" fill="url(#goldGrad)"/>
-            <polygon points="90,142 410,142 250,148" fill="#064e3b"/>
-
-            <!-- AMUKC Bold Typography -->
-            <text x="250" y="215" font-family="'Playfair Display', Georgia, serif" font-weight="900" font-size="78" fill="#064e3b" text-anchor="middle" letter-spacing="2">AMUKC</text>
-
-            <!-- Dinning Script Typography -->
-            <path d="M100,230 L400,230" stroke="url(#goldGrad)" stroke-width="3"/>
-            <text x="250" y="278" font-family="'Great Vibes', cursive" font-size="64" fill="#064e3b" text-anchor="middle" font-weight="bold">Dinning</text>
-            
-            <!-- Bottom Golden Arc & Crossed Mini Cutlery -->
-            <path d="M160,290 Q250,310 340,290" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
-            <g transform="translate(250, 312) scale(0.6)" fill="#064e3b">
-              <path d="M-15,-15 L15,15 M-10,-15 L-5,-25 M-15,-10 L-25,-5 M-12,-12 L-20,-20" stroke="#064e3b" stroke-width="4"/>
-              <ellipse cx="15" cy="-15" rx="6" ry="9" transform="rotate(45 15 -15)"/>
-              <line x1="-15" y1="15" x2="15" y2="-15" stroke="#064e3b" stroke-width="4"/>
-            </g>
-            <path d="M120,320 L210,320 M290,320 L380,320" stroke="url(#goldGrad)" stroke-width="3"/>
-          </svg>
+          <div class="w-full h-full flex flex-col items-center justify-center text-center leading-none">
+            <span class="text-xs font-black text-emerald-900 tracking-tighter font-serif">AMUKC</span>
+            <span class="text-[10px] font-script italic text-amber-700 font-bold -mt-0.5">Dinning</span>
+            <span class="text-[8px] font-bold text-slate-600 uppercase tracking-widest">Portal</span>
+          </div>
         </div>
 
         <!-- Header Title & Cloud Connection Badge -->
@@ -296,14 +212,15 @@
         <form onsubmit="window.app && window.app.verifyAdminPassword(event)" class="space-y-3">
           <div>
             <div class="relative">
-              <input type="password" id="adminPasswordInput" placeholder="Enter Password" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-center text-sm font-bold tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+              <input type="password" id="adminPasswordInput" placeholder="Enter Password" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-center text-sm font-bold tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600">
               <button type="button" onclick="window.app && window.app.togglePasswordVisibility()" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 text-xs">
                 <i class="fa-solid fa-eye" id="passwordEyeIcon"></i>
               </button>
             </div>
+            <!-- Clean Error Message - Never discloses password values -->
             <p id="passwordErrorMsg" class="hidden text-rose-600 font-bold text-[11px] mt-1.5 flex items-center justify-center space-x-1">
               <i class="fa-solid fa-circle-exclamation"></i>
-              <span>Incorrect Password! (AMUKC2026)</span>
+              <span>Incorrect Password! Please try again.</span>
             </p>
           </div>
 
@@ -376,7 +293,7 @@
 
   </div>
 
-  <!-- APPLICATION CORE SCRIPT & NON-BLOCKING DYNAMIC FIREBASE LOADER -->
+  <!-- APPLICATION CORE SCRIPT -->
   <script>
     const ADMIN_PASSWORD_KEY = 'AMUKC2026';
     const MESS_CODE = 'AMUKC2026';
@@ -387,7 +304,6 @@
       dinner: "8:00 PM - 10:00 PM"
     };
 
-    // Strict Cutoff Deadlines for Skipping Meals
     const SKIP_CUTOFFS = {
       breakfast: { hours: 6, mins: 30, str: '6:30 AM' },
       lunch: { hours: 11, mins: 30, str: '11:30 AM' },
@@ -411,7 +327,7 @@
         dinner: { name: 'Aloo Methi, Dal, Rice, Roti' }
       },
       tue: {
-        breakfast: { name: 'Sabzi Sabzi Poori' },
+        breakfast: { name: 'Sabzi Poori' },
         lunch: { name: 'Aloo Tamatar, Daal, Rice, Roti' },
         dinner: { name: 'Egg Curry, Roti, Rice' }
       },
@@ -448,7 +364,6 @@
         this.isAdminAuthenticated = false;
         this.adminTab = 'alerts';
 
-        // Auto-detect current day of week (Monday-indexed)
         const dayOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
         const jsDay = new Date().getDay();
         this.selectedDayId = jsDay === 0 ? 'sun' : dayOrder[jsDay - 1] || 'mon';
@@ -460,21 +375,21 @@
         }
         this.deviceId = devId;
 
-        this.menu = DEFAULT_MENU;
-        this.timings = DEFAULT_TIMINGS;
+        const cachedMenu = localStorage.getItem('amukc_custom_menu');
+        this.menu = cachedMenu ? JSON.parse(cachedMenu) : DEFAULT_MENU;
+
+        const cachedTimings = localStorage.getItem('amukc_custom_timings');
+        this.timings = cachedTimings ? JSON.parse(cachedTimings) : DEFAULT_TIMINGS;
 
         this.verifyDailyReset();
 
-        // Persistent Local Cache
         const cachedRsvps = localStorage.getItem('amukc_rsvps_cache');
         this.rsvps = cachedRsvps ? JSON.parse(cachedRsvps) : {};
 
         const cachedResolved = localStorage.getItem('amukc_resolved_alerts');
         this.resolvedAlerts = cachedResolved ? JSON.parse(cachedResolved) : {};
 
-        // Offline Queue
         this.pendingQueue = JSON.parse(localStorage.getItem('mess_pending_queue') || '[]');
-
         this.studentMap = {};
 
         try {
@@ -486,12 +401,11 @@
           };
         } catch(e) {}
 
-        // Auto-flushing queue retry timer (every 2 seconds)
         setInterval(() => {
-          if (this.pendingQueue.length > 0 && navigator.onLine) {
+          if (navigator.onLine) {
             this.processPendingQueue();
           }
-        }, 2000);
+        }, 5000);
       }
 
       getStudentLabel(studentId) {
@@ -526,7 +440,7 @@
             try {
               const parsed = JSON.parse(cachedRsvps);
               const now = Date.now();
-              const maxAge = 7 * 24 * 60 * 60 * 1000;
+              const maxAge = 14 * 24 * 60 * 60 * 1000;
               const filtered = {};
               Object.keys(parsed).forEach(key => {
                 if (parsed[key] && (now - (parsed[key].updatedAt || 0) < maxAge)) {
@@ -545,32 +459,31 @@
 
       isSkippingAllowed(dayId, mealType) {
         const dayOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-        const jsDay = new Date().getDay();
+        const now = new Date();
+        const jsDay = now.getDay();
         const todayId = jsDay === 0 ? 'sun' : dayOrder[jsDay - 1];
 
         const currentDayIndex = dayOrder.indexOf(todayId);
         const targetDayIndex = dayOrder.indexOf(dayId);
 
-        if (targetDayIndex < currentDayIndex) {
-          return { allowed: false, reason: "Deadline passed for past meals" };
-        }
-        
         if (targetDayIndex > currentDayIndex) {
           return { allowed: true };
         }
 
-        const cutoff = SKIP_CUTOFFS[mealType];
-        if (!cutoff) return { allowed: true };
+        if (targetDayIndex === currentDayIndex) {
+          const cutoff = SKIP_CUTOFFS[mealType];
+          if (!cutoff) return { allowed: true };
 
-        const now = new Date();
-        const currentTotalMins = now.getHours() * 60 + now.getMinutes();
-        const cutoffTotalMins = cutoff.hours * 60 + cutoff.mins;
+          const currentTotalMins = now.getHours() * 60 + now.getMinutes();
+          const cutoffTotalMins = cutoff.hours * 60 + cutoff.mins;
 
-        if (currentTotalMins >= cutoffTotalMins) {
-          return {
-            allowed: false,
-            reason: `Skipping for ${mealType.toUpperCase()} closed at ${cutoff.str}`
-          };
+          if (currentTotalMins >= cutoffTotalMins) {
+            return {
+              allowed: false,
+              reason: `Skipping for ${mealType.toUpperCase()} closed at ${cutoff.str}`
+            };
+          }
+          return { allowed: true };
         }
 
         return { allowed: true };
@@ -596,8 +509,8 @@
         document.addEventListener('cut', (e) => e.preventDefault());
         document.addEventListener('contextmenu', (e) => e.preventDefault());
 
-        // Instant synchronous render from local cache (0ms latency!)
         this.updateHeaderTimings();
+        this.updateNetworkStatusUI(navigator.onLine);
         this.render();
 
         window.addEventListener('online', () => {
@@ -607,10 +520,8 @@
 
         window.addEventListener('offline', () => {
           this.updateNetworkStatusUI(false);
-          this.showToast('⚡ Offline Mode: Responses will auto-sync when online', 'warning');
         });
 
-        // Initialize Firebase non-blockingly in background
         this.initFirebaseAsync();
       }
 
@@ -642,7 +553,7 @@
 
           onAuthStateChanged(this.auth, async (user) => {
             if (user) {
-              this.updateNetworkStatusUI(navigator.onLine);
+              this.updateNetworkStatusUI(true);
               await this.processPendingQueue();
               this.render();
             }
@@ -656,7 +567,6 @@
 
           this.setupRealtimeWebSockets();
         } catch (err) {
-          console.warn("Firebase Dynamic Load Notice:", err);
           this.updateNetworkStatusUI(navigator.onLine);
         }
       }
@@ -666,13 +576,11 @@
         const title = document.getElementById('headerSubTitle');
         if (!dot || !title) return;
 
-        const pendingCount = this.pendingQueue.length;
-
         if (isOnline) {
-          if (pendingCount > 0) {
+          if (this.pendingQueue.length > 3) {
             dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
             title.className = 'text-amber-400 font-bold';
-            title.innerText = `Syncing (${pendingCount} Pending)...`;
+            title.innerText = `Syncing (${this.pendingQueue.length})...`;
           } else {
             dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
             title.className = 'text-emerald-400/90';
@@ -681,7 +589,7 @@
         } else {
           dot.className = 'w-2 h-2 rounded-full bg-rose-500 animate-pulse';
           title.className = 'text-rose-400 font-bold';
-          title.innerText = pendingCount > 0 ? `Offline (${pendingCount} Queued)` : 'Offline Mode';
+          title.innerText = 'Offline Mode (Saved Locally)';
         }
       }
 
@@ -693,33 +601,40 @@
         this.fbOnValue(rsvpsRef, (snapshot) => {
           const cloudData = snapshot.val();
           if (cloudData) {
-            let hasNewRefusal = false;
             const updatedRsvps = { ...this.rsvps };
-
             Object.keys(cloudData).forEach(docId => {
               const item = cloudData[docId];
               if (item && item.studentId) {
-                const alertId = `optout_${docId}`;
-
-                if (item.status === 'skipping' && item.studentId !== this.deviceId && (!this.rsvps[docId] || this.rsvps[docId].status !== 'skipping') && !this.resolvedAlerts[alertId]) {
-                  hasNewRefusal = true;
-                  const devTag = item.studentName || this.getStudentLabel(item.studentId);
-                  const day = DAYS_CONFIG.find(d => d.id === item.dayId) || { name: item.dayId };
-                  this.showToast(`🚨 INSTANT ALERT: ${devTag} marked SKIPPING for ${day.name} ${item.mealType.toUpperCase()}!`, 'warning');
-                }
                 updatedRsvps[docId] = item;
               }
             });
 
             this.rsvps = updatedRsvps;
             localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
-            
-            if (hasNewRefusal) {
-              this.playAudioChime('alert');
-            }
             this.render();
           }
-        }, (err) => console.warn(err));
+        }, () => {});
+
+        const menuRef = this.fbRef(this.rtdb, 'menu');
+        this.fbOnValue(menuRef, (snapshot) => {
+          const cloudMenu = snapshot.val();
+          if (cloudMenu) {
+            this.menu = { ...DEFAULT_MENU, ...cloudMenu };
+            localStorage.setItem('amukc_custom_menu', JSON.stringify(this.menu));
+            this.render();
+          }
+        }, () => {});
+
+        const timingsRef = this.fbRef(this.rtdb, 'timings/hours');
+        this.fbOnValue(timingsRef, (snapshot) => {
+          const cloudTimings = snapshot.val();
+          if (cloudTimings) {
+            this.timings = cloudTimings;
+            localStorage.setItem('amukc_custom_timings', JSON.stringify(this.timings));
+            this.updateHeaderTimings();
+            this.render();
+          }
+        }, () => {});
 
         const resolvedRef = this.fbRef(this.rtdb, 'resolvedAlerts');
         this.fbOnValue(resolvedRef, (snapshot) => {
@@ -727,7 +642,7 @@
           this.resolvedAlerts = cloudResolved;
           localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
           this.render();
-        }, (err) => console.warn(err));
+        }, () => {});
       }
 
       async processPendingQueue() {
@@ -735,31 +650,35 @@
           this.updateNetworkStatusUI(navigator.onLine);
           return;
         }
-        if (!navigator.onLine || !this.rtdb) return;
+
+        if (!navigator.onLine) {
+          this.updateNetworkStatusUI(false);
+          return;
+        }
 
         const queueToProcess = [...this.pendingQueue];
         const remainingQueue = [];
-        let syncedCount = 0;
 
         for (const item of queueToProcess) {
           try {
-            if (item.type === 'rsvp') {
+            if (item.type === 'rsvp' && this.rtdb && this.fbRef && this.fbSet) {
               const singleRef = this.fbRef(this.rtdb, `rsvps/${item.docKey}`);
-              await this.fbSet(singleRef, item.record);
-              syncedCount++;
+              await Promise.race([
+                this.fbSet(singleRef, item.record),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
+              ]);
             }
           } catch (e) {
-            remainingQueue.push(item);
+            item.retries = (item.retries || 0) + 1;
+            if (item.retries < 2) {
+              remainingQueue.push(item);
+            }
           }
         }
 
         this.pendingQueue = remainingQueue;
         localStorage.setItem('mess_pending_queue', JSON.stringify(this.pendingQueue));
         this.updateNetworkStatusUI(navigator.onLine);
-
-        if (syncedCount > 0 && this.pendingQueue.length === 0) {
-          this.showToast(`⚡ Instant Sync Completed!`, 'success');
-        }
       }
 
       playAudioChime(type = 'alert') {
@@ -769,30 +688,16 @@
           const ctx = new AudioContext();
 
           if (type === 'alert') {
-            const osc1 = ctx.createOscillator();
-            const osc2 = ctx.createOscillator();
+            const osc = ctx.createOscillator();
             const gain = ctx.createGain();
-
-            osc1.type = 'triangle';
-            osc2.type = 'sine';
-
-            osc1.frequency.setValueAtTime(659.25, ctx.currentTime);
-            osc1.frequency.setValueAtTime(880, ctx.currentTime + 0.15);
-
-            osc2.frequency.setValueAtTime(329.63, ctx.currentTime);
-            osc2.frequency.setValueAtTime(440, ctx.currentTime + 0.15);
-
-            gain.gain.setValueAtTime(0.2, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-
-            osc1.connect(gain);
-            osc2.connect(gain);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(440, ctx.currentTime);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            osc.connect(gain);
             gain.connect(ctx.destination);
-
-            osc1.start(ctx.currentTime);
-            osc2.start(ctx.currentTime);
-            osc1.stop(ctx.currentTime + 0.4);
-            osc2.stop(ctx.currentTime + 0.4);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.3);
           } else {
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
@@ -820,7 +725,14 @@
         if (this.isAdminAuthenticated) {
           this.switchRole('admin');
         } else {
-          document.getElementById('adminPasswordInput').value = '';
+          const pwdInput = document.getElementById('adminPasswordInput');
+          if (pwdInput) {
+            pwdInput.value = '';
+            pwdInput.type = 'password';
+          }
+          const eyeIcon = document.getElementById('passwordEyeIcon');
+          if (eyeIcon) eyeIcon.className = 'fa-solid fa-eye';
+
           document.getElementById('passwordErrorMsg').classList.add('hidden');
           this.openModal('modalAdminAuth');
         }
@@ -828,18 +740,25 @@
 
       verifyAdminPassword(e) {
         if (e && e.preventDefault) e.preventDefault();
-        const enteredPassword = document.getElementById('adminPasswordInput').value.trim();
+        const pwdInput = document.getElementById('adminPasswordInput');
+        const enteredPassword = pwdInput ? pwdInput.value.trim() : '';
 
         if (enteredPassword === ADMIN_PASSWORD_KEY) {
           this.isAdminAuthenticated = true;
+          if (pwdInput) pwdInput.value = '';
           this.closeModal('modalAdminAuth');
           this.switchRole('admin');
           this.playAudioChime('success');
           this.showToast('🔓 Admin Console Unlocked!', 'success');
         } else {
-          document.getElementById('passwordErrorMsg').classList.remove('hidden');
+          // Hide input value and display clean error message without exposing plain password
+          if (pwdInput) pwdInput.value = '';
+          const errEl = document.getElementById('passwordErrorMsg');
+          if (errEl) {
+            errEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i><span>Incorrect Password! Please try again.</span>`;
+            errEl.classList.remove('hidden');
+          }
           this.playAudioChime('alert');
-          this.showToast('❌ Incorrect Password! (AMUKC2026)', 'warning');
         }
       }
 
@@ -1030,12 +949,10 @@
           dateStamp: new Date().toISOString().split('T')[0]
         };
 
-        // 1. Instant local state update (0ms UI latency)
         this.rsvps[docKey] = updatedRecord;
         localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
         this.render();
 
-        // 2. Non-blocking Background Firebase Write
         if (navigator.onLine && this.rtdb) {
           const singleRef = this.fbRef(this.rtdb, `rsvps/${docKey}`);
           this.fbSet(singleRef, updatedRecord)
@@ -1060,8 +977,7 @@
         }
 
         if (newStatus === 'skipping') {
-          const isOff = !navigator.onLine;
-          this.showToast(isOff ? `⚡ Saved offline for ${effectiveName}` : `🚨 Skipped signal sent for ${effectiveName}`, 'warning');
+          this.showToast(`🚨 Meal skip registered for ${effectiveName}`, 'warning');
         } else {
           this.showToast('✅ Meal skip cancelled for ' + mealType.toUpperCase(), 'success');
           this.playAudioChime('success');
@@ -1152,11 +1068,10 @@
         if (this.broadcastChannel) {
           this.broadcastChannel.postMessage({ type: 'SYNC_REFRESH' });
         }
-        this.showToast('✅ Alert Resolved! Student meal reset to default & Skipping option re-enabled', 'success');
+        this.showToast('✅ Alert Resolved! Student meal reset to default', 'success');
         this.playAudioChime('success');
       }
 
-      // RENDER ROUTER
       render() {
         const container = document.getElementById('mainContent');
         if (!container) return;
@@ -1173,7 +1088,6 @@
         }
       }
 
-      // --- STUDENT VIEW RENDER ---
       renderStudentRsvpView() {
         return `
           <!-- Day Selector Bar -->
@@ -1277,7 +1191,6 @@
         `;
       }
 
-      // --- ADMIN VIEWS RENDER ---
       renderAdminAlertsView() {
         const alerts = this.getUnresolvedAlerts();
 
@@ -1409,6 +1322,7 @@
         updatedDayObj[mealType] = { name, hasVegChoice: hasChoice };
 
         this.menu[dayId] = updatedDayObj;
+        localStorage.setItem('amukc_custom_menu', JSON.stringify(this.menu));
 
         if (navigator.onLine && this.rtdb) {
           try {
@@ -1419,7 +1333,7 @@
 
         this.closeModal('modalEditMenu');
         this.render();
-        this.showToast('Menu updated successfully!', 'success');
+        this.showToast('Menu updated & saved permanently!', 'success');
       }
 
       async handleSaveTimings(e) {
@@ -1431,6 +1345,7 @@
         };
 
         this.timings = newTimings;
+        localStorage.setItem('amukc_custom_timings', JSON.stringify(this.timings));
 
         if (navigator.onLine && this.rtdb) {
           try {
@@ -1480,7 +1395,6 @@
       }
     }
 
-    // Instantiate and Launch App Immediately (0ms startup!)
     window.app = new MessApp();
     window.app.init();
   </script>
