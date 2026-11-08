@@ -80,13 +80,10 @@
       <!-- ROW 1: Logo & Title Bar -->
       <div class="p-2.5 flex items-center space-x-3 border-b border-slate-800/80 bg-slate-950/90">
         
-        <!-- High-Precision Inline Vector Logo Badge (41250_3.png Replica) -->
+        <!-- High-Precision Inline Vector Logo Badge -->
         <div class="w-14 h-14 flex items-center justify-center shrink-0 overflow-hidden bg-gradient-to-b from-amber-50 to-amber-100 rounded-2xl border-2 border-amber-400 shadow-lg p-0.5">
           <svg viewBox="0 0 500 350" class="w-full h-full object-contain" xmlns="http://www.w3.org/2000/svg">
-            <!-- Background Oval Glow -->
             <ellipse cx="250" cy="175" rx="240" ry="160" fill="#fffbeb"/>
-            
-            <!-- Golden Outer Plaque Border & Swooshes -->
             <ellipse cx="250" cy="175" rx="235" ry="155" fill="none" stroke="url(#goldGrad)" stroke-width="10"/>
             <ellipse cx="250" cy="175" rx="225" ry="145" fill="none" stroke="#064e3b" stroke-width="3"/>
 
@@ -124,17 +121,13 @@
 
             <!-- Cloche Dome Body -->
             <path d="M140,135 Q140,48 250,48 Q360,48 360,135 Z" fill="url(#domeGrad)"/>
-            
-            <!-- Cloche Dome Metallic Top Rib & Handle Knob -->
             <path d="M140,135 Q140,55 250,55 Q360,55 360,135 Z" fill="none" stroke="#f59e0b" stroke-width="6"/>
             <circle cx="250" cy="48" r="10" fill="url(#goldGrad)"/>
 
-            <!-- Heritage Building Silhouette Inside Cloche -->
+            <!-- Heritage Building Silhouette -->
             <g fill="#022c22">
               <rect x="180" y="105" width="140" height="30"/>
-              <!-- Central Dome -->
               <path d="M235,105 Q250,88 265,105 Z"/>
-              <!-- Minarets -->
               <rect x="185" y="90" width="8" height="15"/>
               <polygon points="189,82 185,90 193,90"/>
               <rect x="205" y="94" width="6" height="11"/>
@@ -143,7 +136,6 @@
               <polygon points="292,87 289,94 295,94"/>
               <rect x="307" y="90" width="8" height="15"/>
               <polygon points="311,82 307,90 315,90"/>
-              <!-- Arches -->
               <path d="M238,135 L238,115 Q250,108 262,115 L262,135 Z" fill="#fffbeb"/>
               <rect x="195" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
               <rect x="210" y="118" width="8" height="12" rx="4" fill="#fffbeb"/>
@@ -173,7 +165,6 @@
             <!-- Bottom Golden Arc & Crossed Mini Cutlery -->
             <path d="M160,290 Q250,310 340,290" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
             <g transform="translate(250, 312) scale(0.6)" fill="#064e3b">
-              <!-- Crossed Fork & Spoon -->
               <path d="M-15,-15 L15,15 M-10,-15 L-5,-25 M-15,-10 L-25,-5 M-12,-12 L-20,-20" stroke="#064e3b" stroke-width="4"/>
               <ellipse cx="15" cy="-15" rx="6" ry="9" transform="rotate(45 15 -15)"/>
               <line x1="-15" y1="15" x2="15" y2="-15" stroke="#064e3b" stroke-width="4"/>
@@ -223,12 +214,12 @@
         </button>
       </div>
 
-      <!-- Meal Service Timings Banner -->
+      <!-- Meal Service Timings & Skip Deadlines Banner -->
       <div class="bg-slate-950 px-3.5 py-1.5 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-300 font-semibold overflow-x-auto no-scrollbar whitespace-nowrap">
-        <span class="flex items-center text-amber-400 font-bold"><i class="fa-solid fa-clock mr-1"></i> Timings:</span>
-        <span class="bg-slate-900 px-2 py-0.5 rounded-md text-amber-200 border border-slate-800">🥣 Breakfast: <strong id="timingBreakfast">9:30 AM - 11:00 AM</strong></span>
-        <span class="bg-slate-900 px-2 py-0.5 rounded-md text-amber-200 border border-slate-800 ml-1.5">🍱 Lunch: <strong id="timingLunch">1:45 PM - 3:30 PM</strong></span>
-        <span class="bg-slate-900 px-2 py-0.5 rounded-md text-amber-200 border border-slate-800 ml-1.5">🍲 Dinner: <strong id="timingDinner">8:00 PM - 10:00 PM</strong></span>
+        <span class="flex items-center text-amber-400 font-bold"><i class="fa-solid fa-clock mr-1"></i> Cutoffs:</span>
+        <span class="bg-slate-900 px-2 py-0.5 rounded-md text-amber-200 border border-slate-800">🥣 Bkfast: <strong id="timingBreakfast">Before 6:30 AM</strong></span>
+        <span class="bg-slate-900 px-2 py-0.5 rounded-md text-amber-200 border border-slate-800 ml-1.5">🍱 Lunch: <strong id="timingLunch">Before 11:30 AM</strong></span>
+        <span class="bg-slate-900 px-2 py-0.5 rounded-md text-amber-200 border border-slate-800 ml-1.5">🍲 Dinner: <strong id="timingDinner">Before 7:00 PM</strong></span>
       </div>
     </header>
 
@@ -372,6 +363,13 @@
       dinner: "8:00 PM - 10:00 PM"
     };
 
+    // Strict Cutoff Deadlines for Skipping Meals
+    const SKIP_CUTOFFS = {
+      breakfast: { hours: 6, mins: 30, str: '6:30 AM' },
+      lunch: { hours: 11, mins: 30, str: '11:30 AM' },
+      dinner: { hours: 19, mins: 0, str: '7:00 PM' }
+    };
+
     const DAYS_CONFIG = [
       { id: 'mon', name: 'Monday', short: 'Mon' },
       { id: 'tue', name: 'Tuesday', short: 'Tue' },
@@ -492,6 +490,40 @@
         }
       }
 
+      // Check if meal skipping is permitted based on date and cutoff deadline
+      isSkippingAllowed(dayId, mealType) {
+        const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+        const now = new Date();
+        const currentDayIndex = now.getDay();
+        const targetDayIndex = dayKeys.indexOf(dayId);
+
+        // Past day in current week calculation -> Deadline passed
+        if (targetDayIndex < currentDayIndex) {
+          return { allowed: false, reason: "Deadline passed for past meals" };
+        }
+        
+        // Future day -> Skipping allowed
+        if (targetDayIndex > currentDayIndex) {
+          return { allowed: true };
+        }
+
+        // Selected day is Today -> Verify against cutoff time
+        const cutoff = SKIP_CUTOFFS[mealType];
+        if (!cutoff) return { allowed: true };
+
+        const currentTotalMins = now.getHours() * 60 + now.getMinutes();
+        const cutoffTotalMins = cutoff.hours * 60 + cutoff.mins;
+
+        if (currentTotalMins >= cutoffTotalMins) {
+          return {
+            allowed: false,
+            reason: `Skipping for ${mealType.toUpperCase()} closed at ${cutoff.str}`
+          };
+        }
+
+        return { allowed: true };
+      }
+
       async init() {
         // Prevent multi-touch zoom and pinch zoom
         document.addEventListener('touchstart', (e) => {
@@ -582,12 +614,10 @@
         }
       }
 
-      // INSTANT SUB-SECOND WEBSOCKET LISTENER ENGINE
       setupRealtimeWebSockets() {
         if (this.hasSetupWebsockets) return;
         this.hasSetupWebsockets = true;
 
-        // 1. Instant WebSocket listener for RSVP changes across all devices
         const rsvpsRef = ref(rtdb, 'rsvps');
         onValue(rsvpsRef, (snapshot) => {
           const cloudData = snapshot.val();
@@ -600,7 +630,6 @@
               if (item && item.studentId) {
                 const alertId = `optout_${docId}`;
 
-                // Instant alert notification if new refusal from another device
                 if (item.status === 'skipping' && item.studentId !== this.deviceId && (!this.rsvps[docId] || this.rsvps[docId].status !== 'skipping') && !this.resolvedAlerts[alertId]) {
                   hasNewRefusal = true;
                   const devTag = 'Student (' + (item.studentId || '').slice(-4) + ')';
@@ -621,7 +650,6 @@
           }
         });
 
-        // 2. Instant WebSocket listener for Resolved Alerts state
         const resolvedRef = ref(rtdb, 'resolvedAlerts');
         onValue(resolvedRef, (snapshot) => {
           const cloudResolved = snapshot.val() || {};
@@ -708,9 +736,9 @@
       }
 
       updateHeaderTimings() {
-        document.getElementById('timingBreakfast').innerText = this.timings.breakfast || DEFAULT_TIMINGS.breakfast;
-        document.getElementById('timingLunch').innerText = this.timings.lunch || DEFAULT_TIMINGS.lunch;
-        document.getElementById('timingDinner').innerText = this.timings.dinner || DEFAULT_TIMINGS.dinner;
+        document.getElementById('timingBreakfast').innerText = "Before 6:30 AM";
+        document.getElementById('timingLunch').innerText = "Before 11:30 AM";
+        document.getElementById('timingDinner').innerText = "Before 7:00 PM";
       }
 
       requestAdminAccess() {
@@ -865,11 +893,21 @@
         }
       }
 
-      // TOGGLE RSVP WITH UN-TOGGLE SUPPORT & INSTANT WEBSOCKET SYNC
+      // TOGGLE RSVP WITH CUTOFF DEADLINE VERIFICATION
       async toggleRsvp(dayId, mealType, targetStatus) {
         const studentId = this.deviceId;
         const docKey = `${studentId}_${dayId}_${mealType}`;
         const existingDoc = this.rsvps[docKey] || {};
+
+        // If user is selecting 'skipping', verify cutoff deadline
+        if (targetStatus === 'skipping') {
+          const skipCheck = this.isSkippingAllowed(dayId, mealType);
+          if (!skipCheck.allowed) {
+            this.showToast(`🔒 ${skipCheck.reason}!`, 'warning');
+            this.playAudioChime('alert');
+            return;
+          }
+        }
 
         // If user clicks Skipping Meal again when already skipping, toggle back to eating
         let newStatus = targetStatus;
@@ -970,12 +1008,10 @@
         this.showToast(`Preference set to ${choice}`, 'info');
       }
 
-      // RESOLVE ALERT & RESET MEAL RSVP TO WILL EAT ACROSS ALL DEVICES
       async resolveAlert(alertId) {
         if (alertId.startsWith('optout_')) {
           const docKey = alertId.replace('optout_', '');
           
-          // 1. Reset RSVP status back to 'eating' in local state & cache
           if (this.rsvps[docKey]) {
             this.rsvps[docKey].status = 'eating';
             this.rsvps[docKey].updatedAt = Date.now();
@@ -991,11 +1027,9 @@
           }
           localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
 
-          // 2. Remove local resolved marker so student can skip again if needed
           delete this.resolvedAlerts[alertId];
           localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
 
-          // 3. Sync status reset to Firebase Realtime Database
           if (navigator.onLine) {
             try {
               const singleRef = ref(rtdb, `rsvps/${docKey}`);
@@ -1069,8 +1103,10 @@
               const isEating = (rsvpItem.status || 'eating') === 'eating';
               const mealTime = this.timings[mealType] || DEFAULT_TIMINGS[mealType];
               const currentChoice = rsvpItem.choice || 'Paneer';
+              const skipCheck = this.isSkippingAllowed(this.selectedDayId, mealType);
 
               const icons = { breakfast: '🍳', lunch: '🍱', dinner: '🍲' };
+              const cutoffDisplay = SKIP_CUTOFFS[mealType]?.str || 'Deadline';
 
               return `
                 <div class="bg-white rounded-3xl p-4 border ${isEating ? 'border-slate-200' : 'border-rose-300 bg-rose-50/40'} shadow-md space-y-3 transition-all gpu-layer">
@@ -1080,7 +1116,7 @@
                         ${icons[mealType]}
                       </div>
                       <div>
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center space-x-1.5 flex-wrap gap-y-1">
                           <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">${mealType}</span>
                           <span class="text-[10px] text-amber-800 font-extrabold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">${mealTime}</span>
                         </div>
@@ -1106,6 +1142,25 @@
                     </div>
                   ` : ''}
 
+                  <!-- Cutoff Deadline Notice -->
+                  <div class="flex items-center justify-between px-1 text-[10px] font-bold text-slate-500">
+                    <span class="flex items-center space-x-1">
+                      <i class="fa-solid fa-stopwatch text-amber-500"></i>
+                      <span>Skip Deadline: <strong>Before ${cutoffDisplay}</strong></span>
+                    </span>
+                    ${!skipCheck.allowed ? `
+                      <span class="text-rose-600 font-extrabold bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200 flex items-center space-x-1">
+                        <i class="fa-solid fa-lock text-[9px]"></i>
+                        <span>Closed</span>
+                      </span>
+                    ` : `
+                      <span class="text-emerald-600 font-extrabold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center space-x-1">
+                        <i class="fa-solid fa-lock-open text-[9px]"></i>
+                        <span>Open</span>
+                      </span>
+                    `}
+                  </div>
+
                   <!-- RSVP Buttons -->
                   <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100">
                     <button onclick="app.toggleRsvp('${this.selectedDayId}', '${mealType}', 'eating')" class="py-2.5 px-3 rounded-2xl font-black text-xs flex items-center justify-center space-x-1.5 transition-all active:scale-95 ${isEating ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md ring-2 ring-emerald-500/30' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
@@ -1113,9 +1168,9 @@
                       <span>Will Eat</span>
                     </button>
 
-                    <button onclick="app.toggleRsvp('${this.selectedDayId}', '${mealType}', 'skipping')" class="py-2.5 px-3 rounded-2xl font-black text-xs flex items-center justify-center space-x-1.5 transition-all active:scale-95 ${!isEating ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md ring-2 ring-rose-500/30' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
-                      <i class="fa-solid fa-circle-xmark text-sm"></i>
-                      <span>Skipping Meal</span>
+                    <button onclick="app.toggleRsvp('${this.selectedDayId}', '${mealType}', 'skipping')" class="py-2.5 px-3 rounded-2xl font-black text-xs flex items-center justify-center space-x-1.5 transition-all active:scale-95 ${!isEating ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md ring-2 ring-rose-500/30' : !skipCheck.allowed ? 'bg-slate-100 text-slate-400 opacity-60 cursor-not-allowed' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+                      <i class="fa-solid ${!skipCheck.allowed && isEating ? 'fa-lock' : 'fa-circle-xmark'} text-sm"></i>
+                      <span>${!skipCheck.allowed && isEating ? 'Skipping Closed' : 'Skipping Meal'}</span>
                     </button>
                   </div>
                 </div>
@@ -1214,13 +1269,15 @@
             <div class="space-y-3">
               ${['breakfast', 'lunch', 'dinner'].map(m => {
                 const meal = this.menu[this.selectedDayId]?.[m] || { name: '' };
+                const cutoff = SKIP_CUTOFFS[m]?.str || '';
 
                 return `
                   <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm space-y-2">
                     <div class="flex justify-between items-start">
                       <div>
                         <span class="text-[10px] font-black uppercase text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">${m} (${this.timings[m] || ''})</span>
-                        <h4 class="font-extrabold text-slate-900 text-base mt-1">${meal.name}</h4>
+                        <div class="text-[10px] text-rose-700 font-bold mt-1">Skip Deadline: Before ${cutoff}</div>
+                        <h4 class="font-extrabold text-slate-900 text-base mt-0.5">${meal.name}</h4>
                         ${meal.hasVegChoice ? `<span class="inline-block mt-1 bg-emerald-50 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-200">Veg / Non-Veg Option Enabled</span>` : ''}
                       </div>
                       <button onclick="app.openEditMenuModal('${this.selectedDayId}', '${m}')" class="p-2.5 text-orange-600 hover:bg-slate-100 rounded-2xl transition-all active:scale-90">
@@ -1279,7 +1336,6 @@
         };
 
         this.timings = newTimings;
-        this.updateHeaderTimings();
 
         if (navigator.onLine) {
           try {
