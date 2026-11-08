@@ -60,9 +60,9 @@
       will-change: transform, opacity;
     }
     @keyframes pulse-ring {
-      0% { transform: scale(0.97); opacity: 0.8; }
-      50% { transform: scale(1.03); opacity: 1; }
-      100% { transform: scale(0.97); opacity: 0.8; }
+      0% { transform: scale(0.98); opacity: 0.95; }
+      50% { transform: scale(1.02); opacity: 1; }
+      100% { transform: scale(0.98); opacity: 0.95; }
     }
     .alert-pulse {
       animation: pulse-ring 1.8s infinite ease-in-out;
@@ -387,7 +387,7 @@
         dinner: { name: 'Aloo Methi, Dal, Rice, Roti' }
       },
       tue: {
-        breakfast: { name: 'Sabzi Poori' },
+        breakfast: { name: 'Sabzi Sabzi Poori' },
         lunch: { name: 'Aloo Tamatar, Daal, Rice, Roti' },
         dinner: { name: 'Egg Curry, Roti, Rice' }
       },
@@ -468,6 +468,8 @@
         // Offline Queue
         this.pendingQueue = JSON.parse(localStorage.getItem('mess_pending_queue') || '[]');
 
+        this.studentMap = {};
+
         try {
           this.broadcastChannel = new BroadcastChannel('amukc_sync_channel');
           this.broadcastChannel.onmessage = (e) => {
@@ -476,6 +478,36 @@
             }
           };
         } catch(e) {}
+
+        // Auto-flushing queue retry timer (every 2 seconds)
+        setInterval(() => {
+          if (this.pendingQueue.length > 0 && navigator.onLine) {
+            this.processPendingQueue();
+          }
+        }, 2000);
+      }
+
+      // Map dynamic device IDs to clean sequential numbers (Student 1, Student 2, ...)
+      getStudentLabel(studentId) {
+        if (!studentId) return 'Student 1';
+        if (!this.studentMap) this.studentMap = {};
+
+        if (!this.studentMap[studentId]) {
+          const allRsvps = Object.values(this.rsvps || {}).sort((a, b) => (a.updatedAt || 0) - (b.updatedAt || 0));
+          const idList = [];
+          allRsvps.forEach(r => {
+            if (r.studentId && !idList.includes(r.studentId)) {
+              idList.push(r.studentId);
+            }
+          });
+          if (!idList.includes(studentId)) {
+            idList.push(studentId);
+          }
+          idList.forEach((id, idx) => {
+            this.studentMap[id] = `Student ${idx + 1}`;
+          });
+        }
+        return this.studentMap[studentId] || 'Student 1';
       }
 
       verifyDailyReset() {
@@ -550,10 +582,12 @@
         this.updateHeaderTimings();
         this.render();
 
+        // Immediately flush any left-over queue
+        this.processPendingQueue();
+
         // Connectivity Listeners
         window.addEventListener('online', () => {
           this.updateNetworkStatusUI(true);
-          this.showToast('📶 Online Connection Restored! Syncing...', 'info');
           this.processPendingQueue();
         });
 
@@ -632,7 +666,7 @@
 
                 if (item.status === 'skipping' && item.studentId !== this.deviceId && (!this.rsvps[docId] || this.rsvps[docId].status !== 'skipping') && !this.resolvedAlerts[alertId]) {
                   hasNewRefusal = true;
-                  const devTag = 'Student (' + (item.studentId || '').slice(-4) + ')';
+                  const devTag = this.getStudentLabel(item.studentId);
                   const day = DAYS_CONFIG.find(d => d.id === item.dayId) || { name: item.dayId };
                   this.showToast(`🚨 INSTANT ALERT: ${devTag} marked SKIPPING for ${day.name} ${item.mealType.toUpperCase()}!`, 'warning');
                 }
@@ -660,14 +694,16 @@
       }
 
       async processPendingQueue() {
-        if (!navigator.onLine || this.pendingQueue.length === 0) return;
+        if (this.pendingQueue.length === 0) {
+          this.updateNetworkStatusUI(navigator.onLine);
+          return;
+        }
+        if (!navigator.onLine) return;
 
         const queueToProcess = [...this.pendingQueue];
-        this.pendingQueue = [];
-        localStorage.setItem('mess_pending_queue', JSON.stringify([]));
-        this.updateNetworkStatusUI(true);
-
+        const remainingQueue = [];
         let syncedCount = 0;
+
         for (const item of queueToProcess) {
           try {
             if (item.type === 'rsvp') {
@@ -676,16 +712,16 @@
               syncedCount++;
             }
           } catch (e) {
-            this.pendingQueue.push(item);
+            remainingQueue.push(item);
           }
         }
 
+        this.pendingQueue = remainingQueue;
         localStorage.setItem('mess_pending_queue', JSON.stringify(this.pendingQueue));
         this.updateNetworkStatusUI(navigator.onLine);
 
-        if (syncedCount > 0) {
-          this.showToast(`✅ Auto-Synced ${syncedCount} response(s) to cloud!`, 'success');
-          this.playAudioChime('success');
+        if (syncedCount > 0 && this.pendingQueue.length === 0) {
+          this.showToast(`⚡ Instant Sync Completed!`, 'success');
         }
       }
 
@@ -852,7 +888,7 @@
           if (item && item.status === 'skipping') {
             const alertId = `optout_${docId}`;
             if (!this.resolvedAlerts[alertId]) {
-              const devTag = 'Student (' + (item.studentId || '').slice(-4) + ')';
+              const devTag = this.getStudentLabel(item.studentId);
               const day = DAYS_CONFIG.find(d => d.id === item.dayId) || { name: item.dayId };
               const meal = this.menu[item.dayId]?.[item.mealType] || { name: 'Meal' };
 
@@ -893,7 +929,7 @@
         }
       }
 
-      // TOGGLE RSVP WITH CUTOFF DEADLINE VERIFICATION
+      // TOGGLE RSVP WITH INSTANT NON-BLOCKING CLOUD WRITE
       async toggleRsvp(dayId, mealType, targetStatus) {
         const studentId = this.deviceId;
         const docKey = `${studentId}_${dayId}_${mealType}`;
@@ -932,24 +968,28 @@
           dateStamp: new Date().toISOString().split('T')[0]
         };
 
-        // 1. Instant local state update
+        // 1. Instant local state update (0ms UI latency)
         this.rsvps[docKey] = updatedRecord;
         localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
         this.render();
 
-        // 2. Sub-50ms Instant WebSocket Write to Firebase Realtime Database
+        // 2. Non-blocking Background Firebase Write
         if (navigator.onLine) {
-          try {
-            const singleRef = ref(rtdb, `rsvps/${docKey}`);
-            await set(singleRef, updatedRecord);
-
-            if (newStatus === 'eating') {
-              const alertRef = ref(rtdb, `resolvedAlerts/${alertId}`);
-              await set(alertRef, null);
-            }
-          } catch (err) {
-            this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
-          }
+          const singleRef = ref(rtdb, `rsvps/${docKey}`);
+          set(singleRef, updatedRecord)
+            .then(() => {
+              if (newStatus === 'eating') {
+                const alertRef = ref(rtdb, `resolvedAlerts/${alertId}`);
+                set(alertRef, null).catch(() => {});
+              }
+              // Immediately remove from pending queue if present
+              this.pendingQueue = this.pendingQueue.filter(q => q.docKey !== docKey);
+              localStorage.setItem('mess_pending_queue', JSON.stringify(this.pendingQueue));
+              this.updateNetworkStatusUI(true);
+            })
+            .catch(() => {
+              this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
+            });
         } else {
           this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
         }
@@ -973,6 +1013,7 @@
         this.pendingQueue.push(item);
         localStorage.setItem('mess_pending_queue', JSON.stringify(this.pendingQueue));
         this.updateNetworkStatusUI(navigator.onLine);
+        this.processPendingQueue();
       }
 
       async setItemChoice(dayId, mealType, choice) {
@@ -995,12 +1036,16 @@
         this.render();
 
         if (navigator.onLine) {
-          try {
-            const singleRef = ref(rtdb, `rsvps/${docKey}`);
-            await set(singleRef, updatedRecord);
-          } catch(e) {
-            this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
-          }
+          const singleRef = ref(rtdb, `rsvps/${docKey}`);
+          set(singleRef, updatedRecord)
+            .then(() => {
+              this.pendingQueue = this.pendingQueue.filter(q => q.docKey !== docKey);
+              localStorage.setItem('mess_pending_queue', JSON.stringify(this.pendingQueue));
+              this.updateNetworkStatusUI(true);
+            })
+            .catch(() => {
+              this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
+            });
         } else {
           this.enqueuePendingItem({ type: 'rsvp', docKey, record: updatedRecord });
         }
@@ -1031,15 +1076,11 @@
           localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
 
           if (navigator.onLine) {
-            try {
-              const singleRef = ref(rtdb, `rsvps/${docKey}`);
-              await set(singleRef, this.rsvps[docKey]);
+            const singleRef = ref(rtdb, `rsvps/${docKey}`);
+            set(singleRef, this.rsvps[docKey]).catch(() => {});
 
-              const alertRef = ref(rtdb, `resolvedAlerts/${alertId}`);
-              await set(alertRef, null);
-            } catch(e) {
-              console.warn("Firebase sync error on resolve:", e);
-            }
+            const alertRef = ref(rtdb, `resolvedAlerts/${alertId}`);
+            set(alertRef, null).catch(() => {});
           }
         } else {
           this.resolvedAlerts[alertId] = true;
@@ -1183,21 +1224,19 @@
       // --- ADMIN VIEWS RENDER ---
       renderAdminAlertsView() {
         const alerts = this.getUnresolvedAlerts();
-        const totalResponding = new Set(Object.values(this.rsvps).map(r => r.studentId)).size;
 
         return `
-          <!-- Summary Cards -->
-          <div class="grid grid-cols-2 gap-2.5 gpu-layer">
-            <div class="bg-slate-900 text-white rounded-3xl p-4 shadow-md border border-slate-800">
-              <span class="text-[10px] font-bold text-orange-400 uppercase tracking-wider">Active Devices</span>
-              <div class="text-2xl font-black mt-0.5 text-white">${totalResponding}</div>
-              <span class="text-[10px] text-slate-400">Responding Students</span>
-            </div>
-            
-            <div class="bg-gradient-to-br from-rose-600 to-rose-700 text-white rounded-3xl p-4 shadow-md alert-pulse border border-rose-500/40">
-              <span class="text-[10px] font-bold text-rose-100 uppercase tracking-wider">Refusal Alerts</span>
-              <div class="text-2xl font-black mt-0.5">${alerts.length}</div>
-              <span class="text-[10px] text-rose-100 font-semibold">Skipping Meals</span>
+          <!-- Summary Header Card -->
+          <div class="gpu-layer">
+            <div class="bg-gradient-to-br from-rose-600 to-rose-700 text-white rounded-3xl p-4 shadow-md ${alerts.length > 0 ? 'alert-pulse border border-rose-500/40' : 'border border-rose-600'} flex items-center justify-between">
+              <div>
+                <span class="text-[10px] font-bold text-rose-100 uppercase tracking-wider">Refusal Alerts</span>
+                <div class="text-3xl font-black mt-0.5">${alerts.length}</div>
+                <span class="text-[10px] text-rose-100 font-semibold">Students Skipping Meals</span>
+              </div>
+              <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl text-white">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+              </div>
             </div>
           </div>
 
@@ -1215,7 +1254,7 @@
               <div class="bg-emerald-50 border border-emerald-200 rounded-3xl p-6 text-center">
                 <div class="text-3xl mb-2">✅</div>
                 <h4 class="font-bold text-emerald-800 text-sm">No Active Refusal Alerts</h4>
-                <p class="text-xs text-emerald-600 mt-1">All children are attending scheduled meals normally.</p>
+                <p class="text-xs text-emerald-600 mt-1">All students are attending scheduled meals normally.</p>
               </div>
             ` : alerts.map(alert => `
               <div class="bg-white rounded-3xl p-4 border-2 border-rose-400 shadow-md space-y-2.5 relative overflow-hidden gpu-layer">
