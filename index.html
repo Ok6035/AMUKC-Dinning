@@ -173,11 +173,11 @@ animation: pulse-ring 1.8s infinite ease-in-out;
 ​<!-- ROW 2: Student and Admin Switcher Bar -->
 <div class="p-2.5 bg-slate-900 flex items-center justify-between border-b border-slate-800">
 <div class="w-full grid grid-cols-2 bg-slate-950 p-1 rounded-2xl border border-slate-800 gap-1">
-<button id="btnRoleStudent" onclick="app.switchRole('student')" class="py-2 px-3 rounded-xl text-xs font-extrabold transition-all duration-200 flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md active:scale-95">
+<button id="btnRoleStudent" onclick="window.app && window.app.switchRole('student')" class="py-2 px-3 rounded-xl text-xs font-extrabold transition-all duration-200 flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md active:scale-95">
 <i class="fa-solid fa-child-reaching text-xs"></i>
 <span>Student</span>
 </button>
-​<button id="btnRoleAdmin" onclick="app.requestAdminAccess()" class="py-2 px-3 rounded-xl text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center justify-center space-x-2 relative active:scale-95">
+​<button id="btnRoleAdmin" onclick="window.app && window.app.requestAdminAccess()" class="py-2 px-3 rounded-xl text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center justify-center space-x-2 relative active:scale-95">
 <i class="fa-solid fa-lock text-[10px] text-amber-400" id="adminLockIcon"></i>
 <span>Admin</span>
 <span id="adminAlertBadge" class="hidden absolute -top-1 -right-1 bg-rose-600 text-white text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border-2 border-slate-950 shadow">0</span>
@@ -189,7 +189,7 @@ animation: pulse-ring 1.8s infinite ease-in-out;
 <span class="text-indigo-200 font-bold flex items-center">
 <i class="fa-solid fa-shield-halved text-emerald-400 mr-1.5"></i> Admin Console Active
 </span>
-<button onclick="app.lockAdminAccess()" class="bg-rose-900/80 hover:bg-rose-800 text-rose-200 text-[10px] font-extrabold px-2.5 py-0.5 rounded-md border border-rose-500/40 transition-colors flex items-center space-x-1 active:scale-95">
+<button onclick="window.app && window.app.lockAdminAccess()" class="bg-rose-900/80 hover:bg-rose-800 text-rose-200 text-[10px] font-extrabold px-2.5 py-0.5 rounded-md border border-rose-500/40 transition-colors flex items-center space-x-1 active:scale-95">
 <i class="fa-solid fa-lock text-[10px]"></i>
 <span>Lock</span>
 </button>
@@ -204,9 +204,9 @@ animation: pulse-ring 1.8s infinite ease-in-out;
 </header>
 ​<!-- MAIN APP CONTENT CONTAINER -->
 <main class="flex-1 p-3.5 overflow-y-auto no-scrollbar space-y-4 gpu-layer" id="mainContent">
-<div class="py-16 text-center text-slate-400">
-<i class="fa-solid fa-circle-notch fa-spin text-4xl text-orange-500 mb-3"></i>
-<p class="text-xs font-bold tracking-wide">Loading AMUKC Dinning Portal...</p>
+<div class="py-12 text-center text-slate-400">
+<i class="fa-solid fa-utensils text-3xl text-emerald-500 animate-bounce mb-3"></i>
+<p class="text-xs font-bold tracking-wide text-slate-600">Initializing AMUKC Mess Portal...</p>
 </div>
 </main>
 ​<!-- BOTTOM NAVIGATION BAR -->
@@ -218,14 +218,14 @@ animation: pulse-ring 1.8s infinite ease-in-out;
 </div>
 ​<!-- Admin Bottom Navigation Tabs -->
 <div id="adminNav" class="hidden grid grid-cols-2 text-center py-2">
-<button onclick="app.setAdminTab('alerts')" id="tabAdminAlerts" class="py-1 flex flex-col items-center text-indigo-600 font-bold text-xs relative active:scale-95 transition-transform">
+<button onclick="window.app && window.app.setAdminTab('alerts')" id="tabAdminAlerts" class="py-1 flex flex-col items-center text-indigo-600 font-bold text-xs relative active:scale-95 transition-transform">
 <i class="fa-solid fa-triangle-exclamation text-base mb-0.5"></i>
 <span class="relative">
 Refusal Alerts
 <span id="alertsTabDot" class="hidden absolute -top-1 -right-4 w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"></span>
 </span>
 </button>
-<button onclick="app.setAdminTab('menu')" id="tabAdminMenu" class="py-1 flex flex-col items-center text-slate-500 font-medium text-xs hover:text-slate-800 active:scale-95 transition-transform">
+<button onclick="window.app && window.app.setAdminTab('menu')" id="tabAdminMenu" class="py-1 flex flex-col items-center text-slate-500 font-medium text-xs hover:text-slate-800 active:scale-95 transition-transform">
 <i class="fa-solid fa-pen-to-square text-base mb-0.5"></i>
 <span>Edit Menu</span>
 </button>
@@ -241,15 +241,15 @@ Refusal Alerts
 </div>
 <h3 class="font-black text-slate-900 text-base">Skip Meal Registration</h3>
 <p class="text-xs text-slate-500 mt-1 mb-4">Please enter your full name to notify the mess admin.</p>
-​<form onsubmit="app.submitSkipWithName(event)" class="space-y-3">
+​<form onsubmit="window.app && window.app.submitSkipWithName(event)" class="space-y-3">
 <input type="hidden" id="skipDayId">
 <input type="hidden" id="skipMealType">
 ​<div>
 <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1 text-left">Your Full Name</label>
-<input type="text" id="studentNameInput" placeholder="e.g. Mohammad Zaid" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-rose-500">
+<input type="text" id="studentNameInput" placeholder="e.g. Osama Khan" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-rose-500">
 </div>
 ​<div class="pt-2 flex space-x-2">
-<button type="button" onclick="app.closeModal('modalStudentName')" class="w-1/2 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 active:scale-95 transition-transform">Cancel</button>
+<button type="button" onclick="window.app && window.app.closeModal('modalStudentName')" class="w-1/2 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 active:scale-95 transition-transform">Cancel</button>
 <button type="submit" class="w-1/2 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 text-white rounded-xl text-xs font-extrabold hover:from-rose-700 hover:to-rose-800 shadow-md shadow-rose-600/30 active:scale-95 transition-all">Confirm Skip</button>
 </div>
 </form>
@@ -263,11 +263,11 @@ Refusal Alerts
 </div>
 <h3 class="font-black text-slate-900 text-base">Admin Security Check</h3>
 <p class="text-xs text-slate-500 mt-1 mb-4">Enter security password to access Admin Console.</p>
-​<form onsubmit="app.verifyAdminPassword(event)" class="space-y-3">
+​<form onsubmit="window.app && window.app.verifyAdminPassword(event)" class="space-y-3">
 <div>
 <div class="relative">
 <input type="password" id="adminPasswordInput" placeholder="Enter Password" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-center text-sm font-bold tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600">
-<button type="button" onclick="app.togglePasswordVisibility()" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 text-xs">
+<button type="button" onclick="window.app && window.app.togglePasswordVisibility()" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 text-xs">
 <i class="fa-solid fa-eye" id="passwordEyeIcon"></i>
 </button>
 </div>
@@ -277,7 +277,7 @@ Refusal Alerts
 </p>
 </div>
 ​<div class="pt-2 flex space-x-2">
-<button type="button" onclick="app.closeModal('modalAdminAuth')" class="w-1/2 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 active:scale-95 transition-transform">Cancel</button>
+<button type="button" onclick="window.app && window.app.closeModal('modalAdminAuth')" class="w-1/2 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 active:scale-95 transition-transform">Cancel</button>
 <button type="submit" class="w-1/2 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl text-xs font-extrabold hover:from-indigo-700 hover:to-indigo-800 shadow-md shadow-indigo-600/30 active:scale-95 transition-all">Unlock</button>
 </div>
 </form>
@@ -287,7 +287,7 @@ Refusal Alerts
 <div id="modalEditMenu" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
 <div class="bg-white rounded-3xl w-full max-w-xs p-5 shadow-2xl border border-slate-200 text-slate-800">
 <h3 class="font-black text-slate-900 text-base mb-3" id="editMenuTitle">Edit Meal Dish</h3>
-​<form onsubmit="app.handleSaveMenuEdit(event)" class="space-y-3">
+​<form onsubmit="window.app && window.app.handleSaveMenuEdit(event)" class="space-y-3">
 <input type="hidden" id="editDayId">
 <input type="hidden" id="editMealType">
 ​<div>
@@ -302,7 +302,7 @@ Refusal Alerts
 </select>
 </div>
 ​<div class="pt-2 flex space-x-2">
-<button type="button" onclick="app.closeModal('modalEditMenu')" class="w-1/2 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200">Cancel</button>
+<button type="button" onclick="window.app && window.app.closeModal('modalEditMenu')" class="w-1/2 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200">Cancel</button>
 <button type="submit" class="w-1/2 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl text-xs font-extrabold shadow-md">Save</button>
 </div>
 </form>
@@ -312,7 +312,7 @@ Refusal Alerts
 <div id="modalEditTimings" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
 <div class="bg-white rounded-3xl w-full max-w-xs p-5 shadow-2xl border border-slate-200 text-slate-800">
 <h3 class="font-black text-slate-900 text-base mb-3">Edit Mess Service Hours</h3>
-​<form onsubmit="app.handleSaveTimings(event)" class="space-y-3">
+​<form onsubmit="window.app && window.app.handleSaveTimings(event)" class="space-y-3">
 <div>
 <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Breakfast Timing</label>
 <input type="text" id="inputTimingBreakfast" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500">
@@ -326,7 +326,7 @@ Refusal Alerts
 <input type="text" id="inputTimingDinner" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500">
 </div>
 ​<div class="pt-2 flex space-x-2">
-<button type="button" onclick="app.closeModal('modalEditTimings')" class="w-1/2 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200">Cancel</button>
+<button type="button" onclick="window.app && window.app.closeModal('modalEditTimings')" class="w-1/2 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200">Cancel</button>
 <button type="submit" class="w-1/2 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl text-xs font-extrabold shadow-md">Update Hours</button>
 </div>
 </form>
@@ -408,18 +408,23 @@ storageBucket: "amukc-dinning.firebasestorage.app",
 messagingSenderId: "474331563181",
 appId: "1:474331563181:web:f0c533f6f9993278727224"
 };
-​const fbApp = initializeApp(firebaseConfig);
-const auth = getAuth(fbApp);
-const rtdb = getDatabase(fbApp);
+​let fbApp, auth, rtdb;
+try {
+fbApp = initializeApp(firebaseConfig);
+auth = getAuth(fbApp);
+rtdb = getDatabase(fbApp);
+} catch (e) {
+console.warn("Firebase Init fallback:", e);
+}
 ​class MessApp {
 constructor() {
 this.role = 'student';
 this.isAdminAuthenticated = false;
 this.adminTab = 'alerts';
-​// Auto-detect current day of week
-const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-const todayIndex = new Date().getDay();
-this.selectedDayId = dayKeys[todayIndex] || 'mon';
+​// Auto-detect current day of week (Monday-indexed)
+const dayOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const jsDay = new Date().getDay();
+this.selectedDayId = jsDay === 0 ? 'sun' : dayOrder[jsDay - 1] || 'mon';
 ​let devId = localStorage.getItem('mess_device_id');
 if (!devId) {
 devId = 'dev_' + Math.random().toString(36).substring(2, 9);
@@ -428,8 +433,7 @@ localStorage.setItem('mess_device_id', devId);
 this.deviceId = devId;
 ​this.menu = DEFAULT_MENU;
 this.timings = DEFAULT_TIMINGS;
-​// Daily Auto Reset Verification
-this.verifyDailyReset();
+​this.verifyDailyReset();
 ​// Persistent Local Cache
 const cachedRsvps = localStorage.getItem('amukc_rsvps_cache');
 this.rsvps = cachedRsvps ? JSON.parse(cachedRsvps) : {};
@@ -453,8 +457,7 @@ this.processPendingQueue();
 }
 }, 2000);
 }
-​// Fallback label if student name is not explicitly entered
-getStudentLabel(studentId) {
+​getStudentLabel(studentId) {
 if (!studentId) return 'Student';
 if (!this.studentMap) this.studentMap = {};
 ​if (!this.studentMap[studentId]) {
@@ -474,12 +477,27 @@ this.studentMap[id] = Student ${idx + 1};
 }
 return this.studentMap[studentId] || 'Student';
 }
-​verifyDailyReset() {
+​// Preserves valid current/future RSVPs across midnight while cleaning entries older than 7 days
+verifyDailyReset() {
 const todayStr = new Date().toISOString().split('T')[0];
 const lastDate = localStorage.getItem('amukc_last_active_date');
-if (lastDate && lastDate !== todayStr) {
-localStorage.removeItem('amukc_rsvps_cache');
-this.rsvps = {};
+​if (lastDate && lastDate !== todayStr) {
+const cachedRsvps = localStorage.getItem('amukc_rsvps_cache');
+if (cachedRsvps) {
+try {
+const parsed = JSON.parse(cachedRsvps);
+const now = Date.now();
+const maxAge = 7 * 24 * 60 * 60 * 1000;
+const filtered = {};
+Object.keys(parsed).forEach(key => {
+if (parsed[key] && (now - (parsed[key].updatedAt || 0) < maxAge)) {
+filtered[key] = parsed[key];
+}
+});
+this.rsvps = filtered;
+localStorage.setItem('amukc_rsvps_cache', JSON.stringify(filtered));
+} catch(e) {}
+}
 localStorage.setItem('amukc_last_active_date', todayStr);
 } else if (!lastDate) {
 localStorage.setItem('amukc_last_active_date', todayStr);
@@ -487,10 +505,11 @@ localStorage.setItem('amukc_last_active_date', todayStr);
 }
 ​// Check if meal skipping is permitted based on date and cutoff deadline
 isSkippingAllowed(dayId, mealType) {
-const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-const now = new Date();
-const currentDayIndex = now.getDay();
-const targetDayIndex = dayKeys.indexOf(dayId);
+const dayOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const jsDay = new Date().getDay();
+const todayId = jsDay === 0 ? 'sun' : dayOrder[jsDay - 1];
+​const currentDayIndex = dayOrder.indexOf(todayId);
+const targetDayIndex = dayOrder.indexOf(dayId);
 ​if (targetDayIndex < currentDayIndex) {
 return { allowed: false, reason: "Deadline passed for past meals" };
 }
@@ -499,7 +518,8 @@ return { allowed: true };
 }
 ​const cutoff = SKIP_CUTOFFS[mealType];
 if (!cutoff) return { allowed: true };
-​const currentTotalMins = now.getHours() * 60 + now.getMinutes();
+​const now = new Date();
+const currentTotalMins = now.getHours() * 60 + now.getMinutes();
 const cutoffTotalMins = cutoff.hours * 60 + cutoff.mins;
 ​if (currentTotalMins >= cutoffTotalMins) {
 return {
@@ -509,7 +529,7 @@ reason: Skipping for ${mealType.toUpperCase()} closed at ${cutoff.str}
 }
 ​return { allowed: true };
 }
-​async init() {
+​init() {
 document.addEventListener('touchstart', (e) => {
 if (e.touches.length > 1) {
 e.preventDefault();
@@ -526,7 +546,8 @@ lastTouchEnd = now;
 ​document.addEventListener('copy', (e) => e.preventDefault());
 document.addEventListener('cut', (e) => e.preventDefault());
 document.addEventListener('contextmenu', (e) => e.preventDefault());
-​this.updateHeaderTimings();
+​// Instant synchronous render from local cache
+this.updateHeaderTimings();
 this.render();
 ​this.processPendingQueue();
 ​window.addEventListener('online', () => {
@@ -537,12 +558,15 @@ this.processPendingQueue();
 this.updateNetworkStatusUI(false);
 this.showToast('⚡ Offline Mode: Responses will auto-sync when online', 'warning');
 });
-​try {
+​if (rtdb) {
+try {
 this.setupRealtimeWebSockets();
 } catch (err) {
 console.warn("WebSocket setup warning:", err);
 }
-​onAuthStateChanged(auth, async (user) => {
+}
+​if (auth) {
+onAuthStateChanged(auth, async (user) => {
 if (user) {
 this.updateNetworkStatusUI(navigator.onLine);
 await this.processPendingQueue();
@@ -551,14 +575,15 @@ this.render();
 });
 ​try {
 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-await signInWithCustomToken(auth, __initial_auth_token);
+signInWithCustomToken(auth, __initial_auth_token).catch(() => {});
 } else {
-await signInAnonymously(auth);
+signInAnonymously(auth).catch(() => {});
 }
 } catch (err) {
 console.warn("Firebase Auth fallback mode active:", err);
 this.updateNetworkStatusUI(navigator.onLine);
 this.render();
+}
 }
 }
 ​updateNetworkStatusUI(isOnline) {
@@ -583,7 +608,7 @@ title.innerText = pendingCount > 0 ? Offline (${pendingCount} Queued) : 'Offline
 }
 }
 ​setupRealtimeWebSockets() {
-if (this.hasSetupWebsockets) return;
+if (this.hasSetupWebsockets || !rtdb) return;
 this.hasSetupWebsockets = true;
 ​const rsvpsRef = ref(rtdb, 'rsvps');
 onValue(rsvpsRef, (snapshot) => {
@@ -611,6 +636,8 @@ this.playAudioChime('alert');
 }
 this.render();
 }
+}, (err) => {
+console.warn("RTDB RSVPs Sync Notice:", err);
 });
 ​const resolvedRef = ref(rtdb, 'resolvedAlerts');
 onValue(resolvedRef, (snapshot) => {
@@ -618,6 +645,8 @@ const cloudResolved = snapshot.val() || {};
 this.resolvedAlerts = cloudResolved;
 localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
 this.render();
+}, (err) => {
+console.warn("RTDB Resolved Sync Notice:", err);
 });
 }
 ​async processPendingQueue() {
@@ -625,7 +654,7 @@ if (this.pendingQueue.length === 0) {
 this.updateNetworkStatusUI(navigator.onLine);
 return;
 }
-if (!navigator.onLine) return;
+if (!navigator.onLine || !rtdb) return;
 ​const queueToProcess = [...this.pendingQueue];
 const remainingQueue = [];
 let syncedCount = 0;
@@ -701,7 +730,7 @@ this.openModal('modalAdminAuth');
 }
 }
 ​verifyAdminPassword(e) {
-e.preventDefault();
+if (e && e.preventDefault) e.preventDefault();
 const enteredPassword = document.getElementById('adminPasswordInput').value.trim();
 ​if (enteredPassword === ADMIN_PASSWORD_KEY) {
 this.isAdminAuthenticated = true;
@@ -822,32 +851,28 @@ if (badge) badge.classList.add('hidden');
 if (dot) dot.classList.add('hidden');
 }
 }
-​// HANDLE STUDENT SKIPPING MEAL CLICK
-handleSkipButtonClick(dayId, mealType) {
+​handleSkipButtonClick(dayId, mealType) {
 const studentId = this.deviceId;
 const docKey = ${studentId}_${dayId}_${mealType};
 const existingDoc = this.rsvps[docKey] || {};
-​// If currently skipped -> toggle off / cancel skip
-if (existingDoc.status === 'skipping') {
+​if (existingDoc.status === 'skipping') {
 this.toggleRsvp(dayId, mealType, 'eating');
 return;
 }
-​// Check deadline cutoff
-const skipCheck = this.isSkippingAllowed(dayId, mealType);
+​const skipCheck = this.isSkippingAllowed(dayId, mealType);
 if (!skipCheck.allowed) {
 this.showToast(🔒 ${skipCheck.reason}!, 'warning');
 this.playAudioChime('alert');
 return;
 }
-​// Open Student Name Modal
-document.getElementById('skipDayId').value = dayId;
+​document.getElementById('skipDayId').value = dayId;
 document.getElementById('skipMealType').value = mealType;
 const savedName = localStorage.getItem('amukc_student_name') || '';
 document.getElementById('studentNameInput').value = savedName;
 this.openModal('modalStudentName');
 }
 ​submitSkipWithName(e) {
-e.preventDefault();
+if (e && e.preventDefault) e.preventDefault();
 const dayId = document.getElementById('skipDayId').value;
 const mealType = document.getElementById('skipMealType').value;
 const name = document.getElementById('studentNameInput').value.trim();
@@ -856,8 +881,7 @@ const name = document.getElementById('studentNameInput').value.trim();
 this.closeModal('modalStudentName');
 this.toggleRsvp(dayId, mealType, 'skipping', name);
 }
-​// TOGGLE RSVP WITH INSTANT NON-BLOCKING CLOUD WRITE
-async toggleRsvp(dayId, mealType, targetStatus, studentName = null) {
+​async toggleRsvp(dayId, mealType, targetStatus, studentName = null) {
 const studentId = this.deviceId;
 const docKey = ${studentId}_${dayId}_${mealType};
 const existingDoc = this.rsvps[docKey] || {};
@@ -884,7 +908,7 @@ this.rsvps[docKey] = updatedRecord;
 localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
 this.render();
 ​// 2. Non-blocking Background Firebase Write
-if (navigator.onLine) {
+if (navigator.onLine && rtdb) {
 const singleRef = ref(rtdb, rsvps/${docKey});
 set(singleRef, updatedRecord)
 .then(() => {
@@ -937,7 +961,7 @@ dateStamp: new Date().toISOString().split('T')[0]
 ​this.rsvps[docKey] = updatedRecord;
 localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
 this.render();
-​if (navigator.onLine) {
+​if (navigator.onLine && rtdb) {
 const singleRef = ref(rtdb, rsvps/${docKey});
 set(singleRef, updatedRecord)
 .then(() => {
@@ -972,7 +996,7 @@ updatedAt: Date.now()
 localStorage.setItem('amukc_rsvps_cache', JSON.stringify(this.rsvps));
 ​delete this.resolvedAlerts[alertId];
 localStorage.setItem('amukc_resolved_alerts', JSON.stringify(this.resolvedAlerts));
-​if (navigator.onLine) {
+​if (navigator.onLine && rtdb) {
 const singleRef = ref(rtdb, rsvps/${docKey});
 set(singleRef, this.rsvps[docKey]).catch(() => {});
 ​const alertRef = ref(rtdb, resolvedAlerts/${alertId});
@@ -1007,7 +1031,7 @@ container.innerHTML = this.renderAdminMenuView();
 ​// --- STUDENT VIEW RENDER ---
 renderStudentRsvpView() {
 return <!-- Day Selector Bar --> <div class="flex space-x-1.5 overflow-x-auto no-scrollbar py-1"> ${DAYS_CONFIG.map(d =>
-<button onclick="app.selectedDayId = '${d.id}'; app.render();" class="px-3.5 py-2 rounded-2xl text-xs font-extrabold transition-all flex-1 min-w-[55px] text-center active:scale-95 ${this.selectedDayId === d.id ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md ring-2 ring-emerald-500/50' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}">
+<button onclick="window.app.selectedDayId = '${d.id}'; window.app.render();" class="px-3.5 py-2 rounded-2xl text-xs font-extrabold transition-all flex-1 min-w-[55px] text-center active:scale-95 ${this.selectedDayId === d.id ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md ring-2 ring-emerald-500/50' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}">
 <div>${d.short}</div>
 </button>
 `).join('')}
@@ -1051,7 +1075,7 @@ const cutoffDisplay = SKIP_CUTOFFS[mealType]?.str || 'Deadline';
 </div>
 </div>
 ​<!-- Diet Choice Option -->
-${meal.hasVegChoice ? <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-200 flex items-center justify-between"> <span class="text-xs font-bold text-slate-700">Choose Diet Option:</span> <div class="flex space-x-1"> <button onclick="app.setItemChoice('${this.selectedDayId}', '${mealType}', 'Paneer')" class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center space-x-1 active:scale-95 ${currentChoice === 'Paneer' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-300'}"> <span class="w-2 h-2 rounded-full bg-emerald-400"></span> <span>Paneer (Veg)</span> </button> <button onclick="app.setItemChoice('${this.selectedDayId}', '${mealType}', 'Chicken')" class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center space-x-1 active:scale-95 ${currentChoice === 'Chicken' ? 'bg-rose-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-300'}"> <span class="w-2 h-2 rounded-full bg-rose-400"></span> <span>Chicken (Non-Veg)</span> </button> </div> </div> : ''}
+${meal.hasVegChoice ? <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-200 flex items-center justify-between"> <span class="text-xs font-bold text-slate-700">Choose Diet Option:</span> <div class="flex space-x-1"> <button onclick="window.app.setItemChoice('${this.selectedDayId}', '${mealType}', 'Paneer')" class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center space-x-1 active:scale-95 ${currentChoice === 'Paneer' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-300'}"> <span class="w-2 h-2 rounded-full bg-emerald-400"></span> <span>Paneer (Veg)</span> </button> <button onclick="window.app.setItemChoice('${this.selectedDayId}', '${mealType}', 'Chicken')" class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center space-x-1 active:scale-95 ${currentChoice === 'Chicken' ? 'bg-rose-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-300'}"> <span class="w-2 h-2 rounded-full bg-rose-400"></span> <span>Chicken (Non-Veg)</span> </button> </div> </div> : ''}
 ​<!-- Cutoff Deadline Notice -->
 <div class="flex items-center justify-between px-1 text-[10px] font-bold text-slate-500">
 <span class="flex items-center space-x-1">
@@ -1062,7 +1086,7 @@ ${!skipCheck.allowed ? <span class="text-rose-600 font-extrabold bg-rose-50 px-2
 </div>
 ​<!-- Skipping Meal Button Only -->
 <div class="pt-1 border-t border-slate-100">
-<button onclick="app.handleSkipButtonClick('${this.selectedDayId}', '${mealType}')" class="w-full py-3 px-4 rounded-2xl font-black text-xs flex items-center justify-center space-x-2 transition-all active:scale-95 ${isSkipped ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md ring-2 ring-rose-500/30' : !skipCheck.allowed ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-75' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'}">
+<button onclick="window.app.handleSkipButtonClick('${this.selectedDayId}', '${mealType}')" class="w-full py-3 px-4 rounded-2xl font-black text-xs flex items-center justify-center space-x-2 transition-all active:scale-95 ${isSkipped ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md ring-2 ring-rose-500/30' : !skipCheck.allowed ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-75' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'}">
 <i class="fa-solid ${isSkipped ? 'fa-circle-check text-rose-200 text-sm' : !skipCheck.allowed ? 'fa-lock text-slate-400 text-sm' : 'fa-circle-xmark text-rose-600 text-sm'}"></i>
 <span>${isSkipped ? 'Skipping Meal Marked (Tap to Cancel)' : !skipCheck.allowed ? 'Skipping Closed' : 'Skipping Meal'}</span>
 </button>
@@ -1111,7 +1135,7 @@ const alerts = this.getUnresolvedAlerts();
 </div>
 ​<p class="text-xs text-slate-700 pl-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200 font-medium">${alert.desc}</p>
 ​<div class="flex justify-end space-x-2 pt-2 border-t border-slate-100">
-<button onclick="app.resolveAlert('${alert.id}')" class="px-3.5 py-1.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 shadow-sm flex items-center space-x-1.5 active:scale-95">
+<button onclick="window.app.resolveAlert('${alert.id}')" class="px-3.5 py-1.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 shadow-sm flex items-center space-x-1.5 active:scale-95">
 <i class="fa-solid fa-check text-xs text-emerald-400"></i>
 <span>Acknowledge & Resolve</span>
 </button>
@@ -1124,20 +1148,20 @@ return `
 <div class="space-y-4 gpu-layer">
 <div class="flex justify-between items-center px-1">
 <h3 class="text-xs font-black uppercase tracking-wider text-slate-500">Weekly Mess Schedule Editor</h3>
-<button onclick="app.openModal('modalEditTimings')" class="text-[11px] bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-3 py-1 rounded-xl shadow-sm active:scale-95 transition-transform">
+<button onclick="window.app.openModal('modalEditTimings')" class="text-[11px] bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-3 py-1 rounded-xl shadow-sm active:scale-95 transition-transform">
 <i class="fa-solid fa-clock mr-1 text-amber-400"></i> Timings
 </button>
 </div>
 ​<!-- Day Selector -->
 <div class="flex space-x-1.5 overflow-x-auto no-scrollbar py-1">
-${DAYS_CONFIG.map(d => <button onclick="app.selectedDayId = '${d.id}'; app.render();" class="px-3.5 py-2 rounded-2xl text-xs font-extrabold transition-all flex-1 min-w-[55px] text-center active:scale-95 ${this.selectedDayId === d.id ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}"> <div>${d.short}</div> </button>).join('')}
+${DAYS_CONFIG.map(d => <button onclick="window.app.selectedDayId = '${d.id}'; window.app.render();" class="px-3.5 py-2 rounded-2xl text-xs font-extrabold transition-all flex-1 min-w-[55px] text-center active:scale-95 ${this.selectedDayId === d.id ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}"> <div>${d.short}</div> </button>).join('')}
 </div>
 ​<!-- Editable Meal Cards -->
 <div class="space-y-3">
 ${['breakfast', 'lunch', 'dinner'].map(m => {
 const meal = this.menu[this.selectedDayId]?.[m] || { name: '' };
 const cutoff = SKIP_CUTOFFS[m]?.str || '';
-​return <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm space-y-2"> <div class="flex justify-between items-start"> <div> <span class="text-[10px] font-black uppercase text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">${m} (${this.timings[m] || ''})</span> <div class="text-[10px] text-rose-700 font-bold mt-1">Skip Deadline: Before ${cutoff}</div> <h4 class="font-extrabold text-slate-900 text-base mt-0.5">${meal.name}</h4> ${meal.hasVegChoice ?<span class="inline-block mt-1 bg-emerald-50 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-200">Veg / Non-Veg Option Enabled</span>: ''} </div> <button onclick="app.openEditMenuModal('${this.selectedDayId}', '${m}')" class="p-2.5 text-orange-600 hover:bg-slate-100 rounded-2xl transition-all active:scale-90"> <i class="fa-solid fa-pen-to-square text-lg"></i> </button> </div> </div>;
+​return <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm space-y-2"> <div class="flex justify-between items-start"> <div> <span class="text-[10px] font-black uppercase text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">${m} (${this.timings[m] || ''})</span> <div class="text-[10px] text-rose-700 font-bold mt-1">Skip Deadline: Before ${cutoff}</div> <h4 class="font-extrabold text-slate-900 text-base mt-0.5">${meal.name}</h4> ${meal.hasVegChoice ?<span class="inline-block mt-1 bg-emerald-50 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-200">Veg / Non-Veg Option Enabled</span>: ''} </div> <button onclick="window.app.openEditMenuModal('${this.selectedDayId}', '${m}')" class="p-2.5 text-orange-600 hover:bg-slate-100 rounded-2xl transition-all active:scale-90"> <i class="fa-solid fa-pen-to-square text-lg"></i> </button> </div> </div>;
 }).join('')}
 </div>
 </div>
@@ -1153,7 +1177,7 @@ document.getElementById('editMealHasChoice').value = meal.hasVegChoice ? 'true' 
 this.openModal('modalEditMenu');
 }
 ​async handleSaveMenuEdit(e) {
-e.preventDefault();
+if (e && e.preventDefault) e.preventDefault();
 const dayId = document.getElementById('editDayId').value;
 const mealType = document.getElementById('editMealType').value;
 const name = document.getElementById('editMealTitleInput').value.trim();
@@ -1161,7 +1185,7 @@ const hasChoice = document.getElementById('editMealHasChoice').value === 'true';
 ​const updatedDayObj = { ...(this.menu[dayId] || {}) };
 updatedDayObj[mealType] = { name, hasVegChoice: hasChoice };
 ​this.menu[dayId] = updatedDayObj;
-​if (navigator.onLine) {
+​if (navigator.onLine && rtdb) {
 try {
 const menuRef = ref(rtdb, menu/${dayId});
 await set(menuRef, updatedDayObj);
@@ -1172,14 +1196,14 @@ this.render();
 this.showToast('Menu updated successfully!', 'success');
 }
 ​async handleSaveTimings(e) {
-e.preventDefault();
+if (e && e.preventDefault) e.preventDefault();
 const newTimings = {
 breakfast: document.getElementById('inputTimingBreakfast').value.trim(),
 lunch: document.getElementById('inputTimingLunch').value.trim(),
 dinner: document.getElementById('inputTimingDinner').value.trim()
 };
 ​this.timings = newTimings;
-​if (navigator.onLine) {
+​if (navigator.onLine && rtdb) {
 try {
 const timingsRef = ref(rtdb, timings/hours);
 await set(timingsRef, newTimings);
@@ -1217,13 +1241,9 @@ setTimeout(() => toast.remove(), 300);
 }, 3000);
 }
 }
-​// Launch Application Safely Across All Document States
+​// Instantiate and Launch App Immediately
 window.app = new MessApp();
-if (document.readyState === 'loading') {
-document.addEventListener('DOMContentLoaded', () => window.app.init());
-} else {
 window.app.init();
-}
 </script>
 </body>
 </html>
